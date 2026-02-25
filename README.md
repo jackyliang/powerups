@@ -23,7 +23,7 @@ Claude Code loads user-level skills from `~/.claude/skills/`. Each skill is a di
 
 ```bash
 # Clone the repo (skip if already cloned)
-[ -d "$HOME/Code/powerups" ] || git clone https://github.com/YOUR_USERNAME/powerups.git "$HOME/Code/powerups"
+[ -d "$HOME/Code/powerups" ] || git clone https://github.com/jackyliang/powerups.git "$HOME/Code/powerups"
 
 # Ensure the skills directory exists
 mkdir -p "$HOME/.claude/skills"
