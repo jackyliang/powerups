@@ -1,14 +1,17 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "powerups",
+  "description": "Reusable Claude Code skills for disciplined software development.",
   "owner": {
     "name": "jackyliang"
   },
   "plugins": [
     {
       "name": "powerups",
-      "source": ".",
       "description": "TDD, plan-driven development, and database branching skills for Claude Code.",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "source": "./plugins/powerups",
+      "category": "development"
     }
   ]
 }
