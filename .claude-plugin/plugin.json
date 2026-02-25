@@ -1,0 +1,11 @@
+{
+  "name": "powerups",
+  "description": "Reusable Claude Code skills for disciplined software development: TDD, plan-driven development, and database branching.",
+  "version": "1.0.0",
+  "author": {
+    "name": "jackyliang"
+  },
+  "repository": "https://github.com/jackyliang/powerups",
+  "license": "MIT",
+  "keywords": ["tdd", "testing", "planning", "database", "skills"]
+}

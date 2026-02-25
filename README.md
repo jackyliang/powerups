@@ -10,73 +10,37 @@ Reusable [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills fo
 | **plan-driven-development** | Versioned plan files in `plans/` for multi-milestone features. Tracks progress across context windows. |
 | **database-branching** | Fork your database like a git branch. Develop on the fork, merge migrations back, delete the fork. (Ghost DB / TimescaleDB only) |
 
-## Setup
+## Install
 
-Claude Code loads user-level skills from `~/.claude/skills/`. Each skill is a directory containing a `SKILL.md` file. The setup below clones this repo and symlinks the skills into that location so they stay in sync with `git pull`.
-
-### Prerequisites
-
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
-- `git` available on `PATH`
-
-### Install (copy-paste this entire block)
+### As a plugin (recommended)
 
 ```bash
-# Clone the repo (skip if already cloned)
-[ -d "$HOME/Code/powerups" ] || git clone https://github.com/jackyliang/powerups.git "$HOME/Code/powerups"
+# Add the marketplace
+/plugin marketplace add jackyliang/powerups
 
-# Ensure the skills directory exists
+# Install
+/plugin install powerups@powerups
+```
+
+Skills will be available as:
+
+```
+/powerups:test-driven-development
+/powerups:plan-driven-development
+/powerups:database-branching
+```
+
+### Manual (symlink)
+
+If you prefer to manage it yourself:
+
+```bash
+git clone https://github.com/jackyliang/powerups.git "$HOME/Code/powerups"
 mkdir -p "$HOME/.claude/skills"
-
-# Symlink each skill — removes any existing file/directory at the target first
 for skill in test-driven-development plan-driven-development database-branching; do
   rm -rf "$HOME/.claude/skills/$skill"
   ln -sf "$HOME/Code/powerups/skills/$skill" "$HOME/.claude/skills/$skill"
 done
-```
-
-### Verify
-
-After setup, confirm the symlinks point to the repo:
-
-```bash
-ls -la ~/.claude/skills/
-```
-
-Expected output (paths may differ):
-
-```
-test-driven-development -> /Users/you/Code/powerups/skills/test-driven-development
-plan-driven-development -> /Users/you/Code/powerups/skills/plan-driven-development
-database-branching      -> /Users/you/Code/powerups/skills/database-branching
-```
-
-Then open Claude Code. The skills should appear as slash commands:
-
-```
-/test-driven-development
-/plan-driven-development
-/database-branching
-```
-
-### Update
-
-```bash
-cd "$HOME/Code/powerups" && git pull
-```
-
-Symlinks mean the skills update in place — no re-linking needed.
-
-### Uninstall
-
-```bash
-# Remove symlinks
-for skill in test-driven-development plan-driven-development database-branching; do
-  rm -f "$HOME/.claude/skills/$skill"
-done
-
-# Optionally remove the repo
-rm -rf "$HOME/Code/powerups"
 ```
 
 ## License
