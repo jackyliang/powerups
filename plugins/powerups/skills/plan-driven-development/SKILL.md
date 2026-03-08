@@ -123,9 +123,41 @@ Plans are designed for parallel work. When a feature has independent milestones 
 - Which specific milestone/tasks the agent owns
 - TDD requirement: write failing tests first, then implement
 
+## Investigate Before You Design
+
+**Before designing anything, understand what already exists.** Spawn an `Explore` subagent to investigate the codebase — its architecture, services, third-party dependencies, and existing infrastructure. The goal is to discover what the project already has that's relevant to the new feature, so you don't reinvent things or ignore capabilities that are already there.
+
+### Why this matters
+
+A common failure mode: you know about a service (e.g., "we use Nango for OAuth") but when designing a new feature (e.g., webhooks), you treat it as a separate problem and build from scratch — without checking whether that existing service already handles it. **Existing infrastructure is the first place to look for solutions, not the last.**
+
+### What to investigate
+
+Use the `Agent` tool with `subagent_type: "Explore"` (thoroughness: "very thorough") to answer:
+
+1. **What services/dependencies does this project use?** Read CLAUDE.md, package configs, config files, `.env.example`. Understand the full tech stack — not just the parts you've touched before.
+2. **Does any existing service already solve part of this problem?** If the feature involves webhooks, check if the OAuth provider (e.g., Nango) already handles webhook forwarding. If the feature involves background jobs, check if there's already a scheduler. Don't assume you need to build new infrastructure.
+3. **What's the current architecture for similar features?** Read existing implementations of related functionality. How does data flow? What patterns are used? What would break if you changed them?
+4. **What third-party capabilities are available but unused?** Check the docs of services the project depends on. They may offer features the project hasn't leveraged yet that solve the problem directly.
+
+### Rules
+
+- **Always investigate the codebase BEFORE asking the user design questions.** Your questions will be better informed.
+- **Always check existing third-party service capabilities BEFORE designing custom solutions.** If Nango/Supabase/Svix/etc. already handles something, use it.
+- **Spawn an Explore subagent** for thorough investigation. Don't rely on partial knowledge from earlier in the conversation — it may be stale or incomplete.
+- **Report findings to the user** before proposing a design. "I found that Nango already supports webhook forwarding, so we don't need to build our own per-provider webhook infrastructure."
+
+### Anti-pattern: Inventing When You Should Be Discovering
+
+| What you assumed | What was already there | How to avoid |
+|-----------------|----------------------|-------------|
+| "We need per-provider webhook registration" | Nango already forwards provider webhooks | Check existing service docs first |
+| "We need a custom job queue" | Project already has a scheduler service | Read the codebase before designing |
+| "We need to build OAuth token refresh" | Nango handles token refresh automatically | Understand what dependencies provide |
+
 ## Design Phase: Ask Before You Assume
 
-**Before writing the plan, interrogate the requirements.** Use `AskUserQuestion` liberally. Do not assume the simpler solution is what the user wants — present options with honest tradeoffs and recommend the better approach even if it's harder.
+**After investigating the codebase, interrogate the requirements with the user.** Use `AskUserQuestion` liberally. Do not assume the simpler solution is what the user wants — present options with honest tradeoffs and recommend the better approach even if it's harder.
 
 ### What to ask about
 
@@ -135,6 +167,7 @@ Plans are designed for parallel work. When a feature has independent milestones 
   > "Option A: Manual webhook setup (simpler, ships faster, but every customer has to configure it themselves).
   > Option B: Auto-registration via API during connection (more work upfront, but zero friction for customers).
   > I recommend Option B — the upfront cost is worth it for the UX."
+- **Existing infrastructure**: Share what you found in the investigation. "Nango already supports webhook forwarding — should we use that instead of building our own?" Don't bury this — lead with it.
 - **Edge cases**: "What happens when X fails? Should we retry, alert, or silently skip?"
 - **Integration points**: "Does this affect the frontend? Other services? Docs?"
 
@@ -145,6 +178,7 @@ Plans are designed for parallel work. When a feature has independent milestones 
 - **Ask early, not late.** A 30-second question now prevents a multi-hour rewrite later.
 - **It's OK to ask multiple questions at once.** Batch related questions into one message rather than drip-feeding them.
 - **If the user's request is ambiguous, do NOT pick an interpretation and run with it.** Ask which interpretation they mean.
+- **Lead with investigation findings.** If you discovered that existing infrastructure solves the problem, tell the user before asking design questions. It reframes the entire conversation.
 
 ### Anti-patterns
 
@@ -155,17 +189,20 @@ Plans are designed for parallel work. When a feature has independent milestones 
 | Making scope decisions (generic vs specific) | Ask the user's intent |
 | Guessing at UX requirements | Ask what the experience should feel like |
 | Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
+| Designing new infrastructure without checking existing services | Investigate codebase and third-party capabilities first |
+| Treating a known dependency as only doing one thing | Check its full feature set — it may already solve your problem |
 
 ## Workflow
 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
-2. **Ask clarifying questions** — use `AskUserQuestion` to resolve ambiguities, scope, and tradeoffs BEFORE writing the plan. Present options with honest recommendations. Do not skip this step.
-3. Create `plans/v{N}-{description}.md`
-4. Write Context, Design, and Milestones sections
-5. Get user approval on the plan before coding
-6. Identify which milestones/tasks can be parallelized
-7. Begin work — spawn subagents for independent pieces
+2. **Investigate the codebase** — spawn an `Explore` subagent to understand existing architecture, services, and third-party dependencies relevant to the feature. Check if existing infrastructure already solves part of the problem. Do not skip this step.
+3. **Ask clarifying questions** — share investigation findings with the user, then use `AskUserQuestion` to resolve ambiguities, scope, and tradeoffs BEFORE writing the plan. Lead with what you discovered ("I found that X already handles Y — should we use it?"). Do not skip this step.
+4. Create `plans/v{N}-{description}.md`
+5. Write Context, Design, and Milestones sections
+6. Get user approval on the plan before coding
+7. Identify which milestones/tasks can be parallelized
+8. Begin work — spawn subagents for independent pieces
 
 ### Resuming work (new context, no memory)
 1. Read `plans/` directory — find the active plan (latest version with unchecked tasks)
@@ -219,3 +256,6 @@ If code is reverted or the developer isn't happy with the implementation:
 | Making product/scope decisions without asking | Use `AskUserQuestion` — the user's priorities may differ from yours |
 | Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
 | Assuming who "the user" is in a multi-stakeholder system | Ask: is this the developer, their customer, or the end-user? |
+| Designing new infrastructure without investigating existing stack | Spawn an Explore subagent first — existing services may already solve it |
+| Knowing about a dependency but not checking its full capabilities | A service you use for OAuth may also handle webhooks, syncing, etc. |
+| Skipping codebase investigation because "I already know the codebase" | Your knowledge may be partial or stale — always verify before designing |
