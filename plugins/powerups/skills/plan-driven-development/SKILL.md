@@ -173,6 +173,7 @@ Spawn one or more `Explore` subagents (thoroughness: "very thorough") to answer:
   > Option B: Auto-registration via API during connection (more work upfront, but zero friction for customers).
   > I recommend Option B — the upfront cost is worth it for the UX."
 - **Existing infrastructure**: Share what you found in the investigation. "Nango already supports webhook forwarding — should we use that instead of building our own?" Don't bury this — lead with it.
+- **Backwards compatibility**: When a new feature replaces an existing one, ask: "Do you want backwards compatibility with the old approach, or should I remove it entirely?" Most of the time the answer is no — they want the old code gone. **When the answer is no, delete everything**: old implementation code, old tests, old config, old docs references. Don't leave dead code "just in case." A clean codebase is worth more than a safety net nobody asked for.
 - **Edge cases**: "What happens when X fails? Should we retry, alert, or silently skip?"
 - **Integration points**: "Does this affect the frontend? Other services? Docs?"
 
@@ -196,6 +197,7 @@ Spawn one or more `Explore` subagents (thoroughness: "very thorough") to answer:
 | Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
 | Designing new infrastructure without checking existing services | Investigate codebase and third-party capabilities first |
 | Treating a known dependency as only doing one thing | Check its full feature set — it may already solve your problem |
+| Keeping old code/tests "for backwards compatibility" without asking | Ask the user — most of the time they want the old code deleted |
 
 ## Workflow
 
@@ -264,3 +266,4 @@ If code is reverted or the developer isn't happy with the implementation:
 | Designing new infrastructure without investigating existing stack | Spawn an Explore subagent first — existing services may already solve it |
 | Knowing about a dependency but not checking its full capabilities | A service you use for OAuth may also handle webhooks, syncing, etc. |
 | Skipping codebase investigation because "I already know the codebase" | Your knowledge may be partial or stale — always verify before designing |
+| Keeping old implementation alongside the replacement "just in case" | Ask about backwards compatibility — if no, delete old code, tests, and config completely |
