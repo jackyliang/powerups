@@ -67,16 +67,27 @@ Return findings as a checklist:
 - [x] ../answerhq/chat-ui/CLAUDE.md: already up to date
 ```
 
-### Step 4: Apply Updates
+### Step 4: Clarify With the User
 
-Show the user the checklist from Step 3. Ask: "These docs need updating. Should I fix all of them?"
+Before touching any docs, use `AskUserQuestion` to clarify:
 
-When approved:
+- **Scope**: "I found 6 stale doc files. Want me to update all of them, or just specific ones?"
+- **Audience**: "The README describes this feature for external developers. Should the updated docs target the same audience, or has that changed?"
+- **Depth**: "The API reference is missing the new webhook endpoint. Should I add a full description with examples, or just a one-liner?"
+- **Tone/framing**: "The old docs describe polling as the primary sync mechanism. Should the updated docs frame webhooks as the primary and polling as a fallback, or present them as equals?"
+- **What to remove**: "The old recipes show manual schedule setup. Should I remove those entirely, or keep them as an 'advanced override' section?"
+- **Cross-repo impact**: "This change affects the sync-hq-skills plugin that other agents read. Any specific way you want the new behavior described there?"
+
+**Don't assume you know how the user wants their docs written.** The same feature can be documented very differently depending on who reads it and what they need. Ask.
+
+### Step 5: Apply Updates
+
+After getting user direction:
 - Edit each file with the proposed changes
 - Commit per-repo (don't mix commits across repos)
 - Use commit message: `docs: update for [feature name]`
 
-### Step 5: Verify
+### Step 6: Verify
 
 After applying updates:
 - Grep for obviously stale terms across all doc files (old endpoint names, old defaults, removed features)
@@ -114,6 +125,7 @@ After applying updates:
 - **Never skip a doc location.** If CLAUDE.md references a sibling project, check it.
 - **All investigation in subagents.** Reading docs consumes context. Subagents read and return concise diffs.
 - **Ask before editing.** Show the user what's stale and get approval before making changes.
+- **Ask about framing and depth.** Don't assume how the user wants changes described. Use `AskUserQuestion` to clarify scope, audience, tone, and what to remove vs. keep.
 - **Commit per repo.** Don't mix sync_hq and answerhq changes in one commit.
 - **Don't add docs that don't exist.** This skill updates existing docs, not creates new ones. If a doc is missing entirely, flag it and ask the user if they want it created.
 
