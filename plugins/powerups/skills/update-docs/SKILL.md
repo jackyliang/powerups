@@ -1,6 +1,6 @@
 ---
 name: update-docs
-description: Invoke after completing a feature to sync documentation for the current branch's changes. Updates local/project docs by default. Use /update-docs --full for a complete project scan, or /update-docs --public to include public skills/plugins.
+description: Invoke after completing a feature to sync documentation for the current branch's changes. Updates local/project docs by default. Use /update-docs --public to also include public skills/plugins and downstream project docs.
 ---
 
 # Update Docs
@@ -15,7 +15,6 @@ After shipping a feature, documentation drifts. This skill finds what's stale **
 |------|---------------|-------------|
 | **Default** (no flags) | Local project docs only, scoped to current branch changes | After completing a feature on a branch |
 | **`--public`** | Local docs + public skills/plugins + downstream project docs | When changes affect APIs that external agents/projects consume |
-| **`--full`** | Complete scan of all docs regardless of branch changes | Periodic cleanup, rarely needed |
 
 ### What counts as "local" vs "public"
 
@@ -49,8 +48,6 @@ Spawn an `Explore` subagent to understand the current branch's changes:
 
 Return a concise summary of what changed and what categories apply.
 
-**If `--full` mode:** Skip git diff. Scan the entire codebase against all docs.
-
 ### Step 2: Identify Doc Locations
 
 Spawn an `Explore` subagent to find relevant doc files:
@@ -61,7 +58,7 @@ Spawn an `Explore` subagent to find relevant doc files:
 3. **`docs/`** — in-repo guides
 4. **`.env.example`** — env var reference
 
-**Only if `--public` or `--full`:**
+**Only if `--public`:**
 5. **Public skills/plugins** — sibling directories with skill files (e.g., `../sync-hq-skills/`)
 6. **Downstream project docs** — other projects that integrate with this one (e.g., `../answerhq/chat-ui/CLAUDE.md`)
 
@@ -156,4 +153,4 @@ After applying updates:
 | Endpoint additions | New endpoint added, docs not updated | Compare router files against API reference |
 | Removed features | Code deleted, docs still reference it | Grep docs for removed function/endpoint names |
 | Env vars | New var added to config.py but not to CLAUDE.md or .env.example | Compare config.py against env var tables |
-| Downstream integration notes | Upstream API changed, downstream docs stale | Only caught with `--public` flag |
+| Downstream integration notes | Upstream API changed, downstream docs stale | Use `--public` flag to catch |
