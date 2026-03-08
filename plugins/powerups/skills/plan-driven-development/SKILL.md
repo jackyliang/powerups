@@ -123,15 +123,49 @@ Plans are designed for parallel work. When a feature has independent milestones 
 - Which specific milestone/tasks the agent owns
 - TDD requirement: write failing tests first, then implement
 
+## Design Phase: Ask Before You Assume
+
+**Before writing the plan, interrogate the requirements.** Use `AskUserQuestion` liberally. Do not assume the simpler solution is what the user wants — present options with honest tradeoffs and recommend the better approach even if it's harder.
+
+### What to ask about
+
+- **User experience**: "Who performs this action — you, your customer, or their end user? That changes the design significantly."
+- **Scope**: "Should this handle just Zendesk, or be generic for any future provider?"
+- **Architecture tradeoffs**: Present multiple approaches with pros/cons. Recommend the better one, not the easier one. Example:
+  > "Option A: Manual webhook setup (simpler, ships faster, but every customer has to configure it themselves).
+  > Option B: Auto-registration via API during connection (more work upfront, but zero friction for customers).
+  > I recommend Option B — the upfront cost is worth it for the UX."
+- **Edge cases**: "What happens when X fails? Should we retry, alert, or silently skip?"
+- **Integration points**: "Does this affect the frontend? Other services? Docs?"
+
+### Rules
+
+- **Never default to the easy path without presenting the better path.** If there's a harder approach that produces a better product, recommend it explicitly and explain why.
+- **Don't make product decisions silently.** If you're choosing between approaches, surface the decision to the user. What feels obvious to you may not match their priorities.
+- **Ask early, not late.** A 30-second question now prevents a multi-hour rewrite later.
+- **It's OK to ask multiple questions at once.** Batch related questions into one message rather than drip-feeding them.
+- **If the user's request is ambiguous, do NOT pick an interpretation and run with it.** Ask which interpretation they mean.
+
+### Anti-patterns
+
+| Anti-pattern | What to do instead |
+|-------------|-------------------|
+| Silently choosing the simpler approach | Present both, recommend the better one |
+| Assuming who the "user" is | Ask: developer, customer, or end-user? |
+| Making scope decisions (generic vs specific) | Ask the user's intent |
+| Guessing at UX requirements | Ask what the experience should feel like |
+| Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
+
 ## Workflow
 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
-2. Create `plans/v{N}-{description}.md`
-3. Write Context, Design, and Milestones sections
-4. Get user approval on the plan before coding
-5. Identify which milestones/tasks can be parallelized
-6. Begin work — spawn subagents for independent pieces
+2. **Ask clarifying questions** — use `AskUserQuestion` to resolve ambiguities, scope, and tradeoffs BEFORE writing the plan. Present options with honest recommendations. Do not skip this step.
+3. Create `plans/v{N}-{description}.md`
+4. Write Context, Design, and Milestones sections
+5. Get user approval on the plan before coding
+6. Identify which milestones/tasks can be parallelized
+7. Begin work — spawn subagents for independent pieces
 
 ### Resuming work (new context, no memory)
 1. Read `plans/` directory — find the active plan (latest version with unchecked tasks)
@@ -181,3 +215,7 @@ If code is reverted or the developer isn't happy with the implementation:
 | Creating a plan for a 10-minute fix | Only for multi-milestone features |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Running all tasks sequentially | Identify independent work and spawn subagents |
+| Defaulting to the easier solution without asking | Present options, recommend the better one even if harder |
+| Making product/scope decisions without asking | Use `AskUserQuestion` — the user's priorities may differ from yours |
+| Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
+| Assuming who "the user" is in a multi-stakeholder system | Ask: is this the developer, their customer, or the end-user? |
