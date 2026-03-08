@@ -176,6 +176,7 @@ Spawn one or more `Explore` subagents (thoroughness: "very thorough") to answer:
 - **Backwards compatibility**: When a new feature replaces an existing one, ask: "Do you want backwards compatibility with the old approach, or should I remove it entirely?" Most of the time the answer is no — they want the old code gone. **When the answer is no, delete everything**: old implementation code, old tests, old config, old docs references. Don't leave dead code "just in case." A clean codebase is worth more than a safety net nobody asked for.
 - **Edge cases**: "What happens when X fails? Should we retry, alert, or silently skip?"
 - **Integration points**: "Does this affect the frontend? Other services? Docs?"
+- **UI/UX work**: If the feature involves frontend changes, use the **frontend-design** skill for UI implementation. Mention this in the plan's milestones so agents know to invoke it.
 
 ### Rules
 
