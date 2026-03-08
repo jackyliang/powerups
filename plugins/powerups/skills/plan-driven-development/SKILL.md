@@ -9,6 +9,8 @@ description: Use when starting a multi-milestone feature, resuming work after co
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
+**PDD builds on `best-practices`.** Everything in the `best-practices` skill applies here automatically — TDD, investigation, clarifying questions, DRY, worktrees/branches, frontend-design for UI, update-docs when done. PDD adds planning infrastructure on top.
+
 ## When to Use
 
 **Create a plan when:**
@@ -18,7 +20,7 @@ Large features get a versioned plan file in `plans/` that serves as the **single
 - Multiple agents will work on different pieces in parallel
 
 **Skip the plan when:**
-- Single-file change, small bugfix, quick refactor
+- Single-file change, small bugfix, quick refactor — use `best-practices` directly instead
 - Work fits in one session with no risk of context loss
 
 **On every session start for feature work:**
@@ -123,94 +125,16 @@ Plans are designed for parallel work. When a feature has independent milestones 
 - Which specific milestone/tasks the agent owns
 - TDD requirement: write failing tests first, then implement
 
-## Investigate Before You Design
-
-**Before designing anything, understand what already exists.** Spawn an `Explore` subagent to investigate the codebase — its architecture, services, third-party dependencies, and existing infrastructure. The goal is to discover what the project already has that's relevant to the new feature, so you don't reinvent things or ignore capabilities that are already there.
-
-### Why this matters
-
-A common failure mode: you know about a service (e.g., "we use Nango for OAuth") but when designing a new feature (e.g., webhooks), you treat it as a separate problem and build from scratch — without checking whether that existing service already handles it. **Existing infrastructure is the first place to look for solutions, not the last.**
-
-### What to investigate
-
-**All investigation MUST happen in subagents.** Codebase exploration, reading config files, reading existing plans, and reading large source files consume enormous amounts of context. The main conversation should stay lean — receive concise summaries, not raw file contents.
-
-Spawn one or more `Explore` subagents (thoroughness: "very thorough") to answer:
-
-1. **What services/dependencies does this project use?** Read CLAUDE.md, package configs, config files, `.env.example`. Understand the full tech stack — not just the parts you've touched before.
-2. **Does any existing service already solve part of this problem?** If the feature involves webhooks, check if the OAuth provider (e.g., Nango) already handles webhook forwarding. If the feature involves background jobs, check if there's already a scheduler. Don't assume you need to build new infrastructure.
-3. **What's the current architecture for similar features?** Read existing implementations of related functionality. How does data flow? What patterns are used? What would break if you changed them?
-4. **What third-party capabilities are available but unused?** Check the docs of services the project depends on. They may offer features the project hasn't leveraged yet that solve the problem directly.
-
-**Subagent prompt template for investigation:**
-> "Investigate the codebase for [feature area]. Read CLAUDE.md, relevant source files, config, and existing plans in plans/. Return a concise summary (not raw file contents): (1) what services/infra already exist for this, (2) what third-party dependencies are used and what capabilities they offer beyond what's currently used, (3) the current architecture pattern for similar features, (4) any existing plan files and their status. Keep the summary under 50 lines."
-
-### Rules
-
-- **Always investigate the codebase BEFORE asking the user design questions.** Your questions will be better informed.
-- **Always check existing third-party service capabilities BEFORE designing custom solutions.** If Nango/Supabase/Svix/etc. already handles something, use it.
-- **Spawn an Explore subagent** for thorough investigation. Don't rely on partial knowledge from earlier in the conversation — it may be stale or incomplete.
-- **Report findings to the user** before proposing a design. "I found that Nango already supports webhook forwarding, so we don't need to build our own per-provider webhook infrastructure."
-
-### Anti-pattern: Inventing When You Should Be Discovering
-
-| What you assumed | What was already there | How to avoid |
-|-----------------|----------------------|-------------|
-| "We need per-provider webhook registration" | Nango already forwards provider webhooks | Check existing service docs first |
-| "We need a custom job queue" | Project already has a scheduler service | Read the codebase before designing |
-| "We need to build OAuth token refresh" | Nango handles token refresh automatically | Understand what dependencies provide |
-
-## Design Phase: Ask Before You Assume
-
-**After investigating the codebase, interrogate the requirements with the user.** Use `AskUserQuestion` liberally. Do not assume the simpler solution is what the user wants — present options with honest tradeoffs and recommend the better approach even if it's harder.
-
-### What to ask about
-
-- **User experience**: "Who performs this action — you, your customer, or their end user? That changes the design significantly."
-- **Scope**: "Should this handle just Zendesk, or be generic for any future provider?"
-- **Architecture tradeoffs**: Present multiple approaches with pros/cons. Recommend the better one, not the easier one. Example:
-  > "Option A: Manual webhook setup (simpler, ships faster, but every customer has to configure it themselves).
-  > Option B: Auto-registration via API during connection (more work upfront, but zero friction for customers).
-  > I recommend Option B — the upfront cost is worth it for the UX."
-- **Existing infrastructure**: Share what you found in the investigation. "Nango already supports webhook forwarding — should we use that instead of building our own?" Don't bury this — lead with it.
-- **Backwards compatibility**: When a new feature replaces an existing one, ask: "Do you want backwards compatibility with the old approach, or should I remove it entirely?" Most of the time the answer is no — they want the old code gone. **When the answer is no, delete everything**: old implementation code, old tests, old config, old docs references. Don't leave dead code "just in case." A clean codebase is worth more than a safety net nobody asked for.
-- **Edge cases**: "What happens when X fails? Should we retry, alert, or silently skip?"
-- **Integration points**: "Does this affect the frontend? Other services? Docs?"
-- **UI/UX work**: If the feature involves frontend changes, use the **frontend-design** skill for UI implementation. Mention this in the plan's milestones so agents know to invoke it.
-
-### Rules
-
-- **Never default to the easy path without presenting the better path.** If there's a harder approach that produces a better product, recommend it explicitly and explain why.
-- **Don't make product decisions silently.** If you're choosing between approaches, surface the decision to the user. What feels obvious to you may not match their priorities.
-- **Ask early, not late.** A 30-second question now prevents a multi-hour rewrite later.
-- **It's OK to ask multiple questions at once.** Batch related questions into one message rather than drip-feeding them.
-- **If the user's request is ambiguous, do NOT pick an interpretation and run with it.** Ask which interpretation they mean.
-- **Lead with investigation findings.** If you discovered that existing infrastructure solves the problem, tell the user before asking design questions. It reframes the entire conversation.
-
-### Anti-patterns
-
-| Anti-pattern | What to do instead |
-|-------------|-------------------|
-| Silently choosing the simpler approach | Present both, recommend the better one |
-| Assuming who the "user" is | Ask: developer, customer, or end-user? |
-| Making scope decisions (generic vs specific) | Ask the user's intent |
-| Guessing at UX requirements | Ask what the experience should feel like |
-| Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
-| Designing new infrastructure without checking existing services | Investigate codebase and third-party capabilities first |
-| Treating a known dependency as only doing one thing | Check its full feature set — it may already solve your problem |
-| Keeping old code/tests "for backwards compatibility" without asking | Ask the user — most of the time they want the old code deleted |
-
 ## Workflow
 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
-2. **Investigate the codebase** — spawn an `Explore` subagent to understand existing architecture, services, and third-party dependencies relevant to the feature. Check if existing infrastructure already solves part of the problem. Do not skip this step.
-3. **Ask clarifying questions** — share investigation findings with the user, then use `AskUserQuestion` to resolve ambiguities, scope, and tradeoffs BEFORE writing the plan. Lead with what you discovered ("I found that X already handles Y — should we use it?"). Do not skip this step.
-4. Create `plans/v{N}-{description}.md`
-5. Write Context, Design, and Milestones sections
-6. Get user approval on the plan before coding
-7. Identify which milestones/tasks can be parallelized
-8. Begin work — spawn subagents for independent pieces
+2. **Follow `best-practices` steps 1–3** — create worktree/branch, investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
+3. Create `plans/v{N}-{description}.md`
+4. Write Context, Design, and Milestones sections
+5. Get user approval on the plan before coding
+6. Identify which milestones/tasks can be parallelized
+7. Begin work — spawn subagents for independent pieces
 
 ### Resuming work (new context, no memory)
 1. Spawn an `Explore` subagent to read `plans/` and return a summary: which plan is active, what milestone you're on, what the next unchecked task is, and any key design context. **Do not read plan files directly** — they are large and will bloat your context.
@@ -239,6 +163,11 @@ When a milestone is complete (all tasks checked), **stop and let the user test m
 
 This ensures the user validates each milestone incrementally rather than discovering issues after everything is built.
 
+### After all milestones complete
+- Run the `update-docs` skill to sync all documentation
+- Run the project's linter
+- Create PR
+
 ### Rolling back work
 If code is reverted or the developer isn't happy with the implementation:
 - Uncheck tasks back to the rolled-back state: `- [x]` → `- [ ]`
@@ -257,14 +186,7 @@ If code is reverted or the developer isn't happy with the implementation:
 | Starting to code without checking `plans/` | Always check first — you may be mid-feature |
 | Vague tasks ("set up auth") | Be specific: file paths, endpoint names, model fields |
 | Forgetting to check off tasks | Update immediately — the plan is only useful if current |
-| Creating a plan for a 10-minute fix | Only for multi-milestone features |
+| Creating a plan for a 10-minute fix | Use `best-practices` directly for small changes |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Running all tasks sequentially | Identify independent work and spawn subagents |
-| Defaulting to the easier solution without asking | Present options, recommend the better one even if harder |
-| Making product/scope decisions without asking | Use `AskUserQuestion` — the user's priorities may differ from yours |
-| Writing the full plan then asking "looks good?" | Ask clarifying questions BEFORE writing the plan |
-| Assuming who "the user" is in a multi-stakeholder system | Ask: is this the developer, their customer, or the end-user? |
-| Designing new infrastructure without investigating existing stack | Spawn an Explore subagent first — existing services may already solve it |
-| Knowing about a dependency but not checking its full capabilities | A service you use for OAuth may also handle webhooks, syncing, etc. |
-| Skipping codebase investigation because "I already know the codebase" | Your knowledge may be partial or stale — always verify before designing |
-| Keeping old implementation alongside the replacement "just in case" | Ask about backwards compatibility — if no, delete old code, tests, and config completely |
+| Skipping investigation/questions because "I know the codebase" | Always follow `best-practices` steps — investigate and ask first |
