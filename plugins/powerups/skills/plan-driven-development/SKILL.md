@@ -22,9 +22,9 @@ Large features get a versioned plan file in `plans/` that serves as the **single
 - Work fits in one session with no risk of context loss
 
 **On every session start for feature work:**
-- Check `plans/` for an existing plan before writing any code
-- If one exists, read it — you may be mid-development from a prior context
-- Update the progress summary table and check off completed tasks
+- Spawn an `Explore` subagent to check `plans/` for an existing plan. Plan files are large and consume significant context — **never read them directly in the main conversation**. The subagent should read the plan and return a concise summary: current milestone, next unchecked task, any blockers, and key design decisions.
+- If the subagent finds an active plan, use its summary to orient yourself. Only read specific sections of the plan directly if you need exact task wording or file paths.
+- Update the progress summary table and check off completed tasks (these edits are small and fine in the main context).
 
 ## Plan Location & Naming
 
@@ -133,12 +133,17 @@ A common failure mode: you know about a service (e.g., "we use Nango for OAuth")
 
 ### What to investigate
 
-Use the `Agent` tool with `subagent_type: "Explore"` (thoroughness: "very thorough") to answer:
+**All investigation MUST happen in subagents.** Codebase exploration, reading config files, reading existing plans, and reading large source files consume enormous amounts of context. The main conversation should stay lean — receive concise summaries, not raw file contents.
+
+Spawn one or more `Explore` subagents (thoroughness: "very thorough") to answer:
 
 1. **What services/dependencies does this project use?** Read CLAUDE.md, package configs, config files, `.env.example`. Understand the full tech stack — not just the parts you've touched before.
 2. **Does any existing service already solve part of this problem?** If the feature involves webhooks, check if the OAuth provider (e.g., Nango) already handles webhook forwarding. If the feature involves background jobs, check if there's already a scheduler. Don't assume you need to build new infrastructure.
 3. **What's the current architecture for similar features?** Read existing implementations of related functionality. How does data flow? What patterns are used? What would break if you changed them?
 4. **What third-party capabilities are available but unused?** Check the docs of services the project depends on. They may offer features the project hasn't leveraged yet that solve the problem directly.
+
+**Subagent prompt template for investigation:**
+> "Investigate the codebase for [feature area]. Read CLAUDE.md, relevant source files, config, and existing plans in plans/. Return a concise summary (not raw file contents): (1) what services/infra already exist for this, (2) what third-party dependencies are used and what capabilities they offer beyond what's currently used, (3) the current architecture pattern for similar features, (4) any existing plan files and their status. Keep the summary under 50 lines."
 
 ### Rules
 
@@ -205,8 +210,8 @@ Use the `Agent` tool with `subagent_type: "Explore"` (thoroughness: "very thorou
 8. Begin work — spawn subagents for independent pieces
 
 ### Resuming work (new context, no memory)
-1. Read `plans/` directory — find the active plan (latest version with unchecked tasks)
-2. Read the plan top-to-bottom
+1. Spawn an `Explore` subagent to read `plans/` and return a summary: which plan is active, what milestone you're on, what the next unchecked task is, and any key design context. **Do not read plan files directly** — they are large and will bloat your context.
+2. Use the subagent's summary to orient yourself
 3. Find the first unchecked task — that's where to resume
 4. Continue working, checking off tasks as you go
 
