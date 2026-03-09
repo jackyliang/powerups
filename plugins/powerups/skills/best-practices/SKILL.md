@@ -17,12 +17,13 @@ The baseline discipline for every code change, no matter how small. A bug fix, a
 
 ### 1. Never Develop on Main
 
-**Before writing any code, create a worktree or branch.** Ask the user which they prefer:
+**Before writing any code, create a new branch.**
 
-> "Should I create a git worktree (isolated copy, good for parallel work) or a new branch (simpler, single workspace)?"
+```bash
+git checkout -b feature/name
+```
 
-- **Worktree** — `git worktree add ../project-feature feature/name` — use when the user works on multiple things in parallel, or when you're spawning subagents that need isolation
-- **Branch** — `git checkout -b feature/name` — use for simple sequential work
+If the user explicitly requests a worktree (e.g., for parallel work or subagent isolation), use `git worktree add ../project-feature feature/name` instead, then invoke the `start-dev-server` skill as a background subagent to start dev servers in the worktree.
 
 **Never commit directly to main.** No exceptions.
 
@@ -127,7 +128,7 @@ Run the project's linter before committing:
 
 | Don't | Do |
 |-------|-----|
-| Commit to main | Create worktree or branch first |
+| Commit to main | Create a branch first |
 | Start coding without checking what exists | Spawn Explore subagent first |
 | Guess what the user wants | Ask with `AskUserQuestion` |
 | Write tests after implementation | Write failing tests first (TDD) |
