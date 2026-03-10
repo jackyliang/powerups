@@ -1,6 +1,6 @@
 ---
 name: best-practices
-description: Use for any code change — bug fix, small feature, refactor, or improvement. Ensures TDD, clarifying questions, codebase investigation, DRY, proper branching/worktrees, UI skills, and doc updates. PDD invokes this automatically for large features.
+description: Use for any code change — bug fix, small feature, refactor, or improvement. Ensures TDD, clarifying questions, codebase investigation, DRY, proper branching, UI skills, and doc updates. PDD invokes this automatically for large features.
 ---
 
 # Best-Practices-Driven Development (BPDD)
@@ -22,8 +22,6 @@ The baseline discipline for every code change, no matter how small. A bug fix, a
 ```bash
 git checkout -b feature/name
 ```
-
-If the user explicitly requests a worktree (e.g., for parallel work or subagent isolation), use `git worktree add ../project-feature feature/name` instead, then invoke the `start-dev-server` skill as a background subagent to start dev servers in the worktree.
 
 **Never commit directly to main.** No exceptions.
 
@@ -114,7 +112,7 @@ Run the project's linter before committing:
 ## Quick Reference
 
 ```
-1. Branch or worktree (never main)
+1. Branch (never main)
 2. Investigate (subagent — what exists?)
 3. Ask (clarify requirements with user)
 4. TDD (red → green → refactor)

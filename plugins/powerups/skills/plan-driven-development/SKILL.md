@@ -9,7 +9,7 @@ description: Use when starting a multi-milestone feature, resuming work after co
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
-**PDD builds on `best-practices`.** Everything in the `best-practices` skill applies here automatically — TDD, investigation, clarifying questions, DRY, worktrees/branches, frontend-design for UI, update-docs when done. PDD adds planning infrastructure on top.
+**PDD builds on `best-practices`.** Everything in the `best-practices` skill applies here automatically — TDD, investigation, clarifying questions, DRY, branching, frontend-design for UI, update-docs when done. PDD adds planning infrastructure on top.
 
 ## When to Use
 
@@ -129,7 +129,7 @@ Plans are designed for parallel work. When a feature has independent milestones 
 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
-2. **Follow `best-practices` steps 1–3** — create worktree/branch, investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
+2. **Follow `best-practices` steps 1–3** — create branch, investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
 3. Create `plans/v{N}-{description}.md`
 4. Write Context, Design, and Milestones sections
 5. Get user approval on the plan before coding
