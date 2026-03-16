@@ -26,8 +26,8 @@ After shipping a feature, documentation drifts. This skill finds what's stale **
   - `plans/` — plan files with outdated status
 
 - **Public docs** — files in other repos that external agents or projects consume:
-  - Public skill plugins (e.g., `../sync-hq-skills/`) — other agents read these to integrate
-  - Downstream project docs (e.g., `../answerhq/chat-ui/CLAUDE.md`) — other projects that reference this one
+  - Public skill plugins (sibling directories with skill files) — other agents read these to integrate
+  - Downstream project docs — other projects that reference this one
   - Any sibling repo referenced in CLAUDE.md
 
 **Default behavior: local only.** Public docs are not touched unless `--public` or `--full` is specified.
@@ -59,8 +59,8 @@ Spawn an `Explore` subagent to find relevant doc files:
 4. **`.env.example`** — env var reference
 
 **Only if `--public`:**
-5. **Public skills/plugins** — sibling directories with skill files (e.g., `../sync-hq-skills/`)
-6. **Downstream project docs** — other projects that integrate with this one (e.g., `../answerhq/chat-ui/CLAUDE.md`)
+5. **Public skills/plugins** — sibling directories with skill files referenced in CLAUDE.md
+6. **Downstream project docs** — other projects that integrate with this one, referenced in CLAUDE.md
 
 The subagent should return the list of doc files and what each covers.
 
@@ -136,6 +136,39 @@ After applying updates:
 - API URLs and env vars: still correct?
 - Behavior descriptions: match current implementation?
 
+## Reducing Doc Scatter
+
+When multiple repos are involved in a feature (e.g., a service + its SDK, or two services that integrate), documentation naturally fragments. Each repo partially explains the integration, and none tells the full story. This is the most common source of confusion.
+
+**The fix: single source of truth for cross-repo concerns.**
+
+### The Pattern
+
+1. **Pick one location** for the integration guide — typically a shared skills/docs repo, or the repo that orchestrates the integration.
+2. **Write one document** that covers the full end-to-end flow: what each system owns, how they communicate, the data contract (payloads, schemas), and key files in each repo.
+3. **Each repo's own docs (CLAUDE.md, README) just link to it** with a one-liner: "For how this integrates with X, see `../shared-docs/integration-guide.md`."
+4. **Never partially explain the same integration in two places.** If you find two repos each describing half the story, recommend consolidating into one guide and replacing the other with a link.
+
+### When to Flag Scatter
+
+During Step 3 (diffing docs against reality), watch for:
+- Two or more docs explaining the same cross-repo flow differently
+- CLAUDE.md in repo A describing repo B's internals (and vice versa)
+- Webhook/API contracts documented in the sender AND receiver with different details
+- The same payload or schema described in multiple places
+
+When you find this, **recommend consolidation** before making edits. Ask the user: "I found the X integration partially described in N places. Want me to consolidate into one guide and replace the others with links?"
+
+### What Goes Where
+
+| Doc type | Scope | Example |
+|----------|-------|---------|
+| **Integration guide** (shared) | End-to-end flow across repos, data contracts, what each system owns | "How Service A + Service B work together" |
+| **CLAUDE.md** (per-repo) | How to work in THIS codebase — key files, commands, conventions | Links to integration guide for cross-repo context |
+| **README.md** (per-repo) | What this repo IS, how to set it up, how to run it | Does not explain other repos |
+| **API reference** (per-repo) | Endpoints, request/response formats for THIS service | Payload schemas for events this service sends |
+| **Skill docs** (shared) | How to USE a service from another codebase | Recipes, workflow steps, troubleshooting |
+
 ## Rules
 
 - **Default scope is local + branch changes only.** Don't touch public/downstream docs unless asked.
@@ -144,6 +177,7 @@ After applying updates:
 - **Ask about framing and depth.** Use `AskUserQuestion` to clarify scope, audience, tone, and what to remove vs. keep.
 - **Commit per repo.** Don't mix changes across repos in one commit.
 - **Don't add docs that don't exist.** This skill updates existing docs, not creates new ones. If a doc is missing entirely, flag it and ask the user if they want it created.
+- **Flag scatter, don't perpetuate it.** If the same integration is partially documented in multiple places, recommend consolidation before adding more partial docs.
 
 ## Common Drift Patterns
 
@@ -154,3 +188,4 @@ After applying updates:
 | Removed features | Code deleted, docs still reference it | Grep docs for removed function/endpoint names |
 | Env vars | New var added to config.py but not to CLAUDE.md or .env.example | Compare config.py against env var tables |
 | Downstream integration notes | Upstream API changed, downstream docs stale | Use `--public` flag to catch |
+| Scattered integration docs | Each repo partially explains the same flow | Look for the same webhook/API/flow described in 2+ places |
