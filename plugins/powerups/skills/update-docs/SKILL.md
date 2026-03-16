@@ -50,18 +50,20 @@ Return a concise summary of what changed and what categories apply.
 
 ### Step 2: Identify Doc Locations
 
-Spawn an `Explore` subagent to find relevant doc files. **Start by reading the project's CLAUDE.md** — look for a "Documentation Locations" section that declares where this project's docs live, including cross-repo locations. If it exists, use it as the authoritative list. If not, discover locations manually:
+Spawn an `Explore` subagent to discover all doc files that might need updating. The skill owns this discovery — don't rely on CLAUDE.md to list locations.
 
 **Always check (local):**
-1. **CLAUDE.md** — project instructions (look for a doc locations section)
+1. **CLAUDE.md** — project instructions, key files tables, env var sections
 2. **README.md** — project readme
-3. **`docs/`** — in-repo guides
+3. **`docs/`** — in-repo guides (glob for `docs/**/*.md`)
 4. **`.env.example`** — env var reference
 
 **Only if `--public`:**
-5. **Public skills/plugins** — sibling directories with skill files referenced in CLAUDE.md
-6. **Downstream project docs** — other projects that integrate with this one, referenced in CLAUDE.md
-7. **Integration guides** — shared docs that cover cross-repo flows, referenced in CLAUDE.md
+
+Scan CLAUDE.md for references to sibling repos and external doc locations:
+5. **Sibling skill/plugin repos** — grep CLAUDE.md for `../` paths pointing to skill directories or plugin repos. These contain docs that other agents consume and must stay in sync.
+6. **Downstream project docs** — grep CLAUDE.md for references to other projects' CLAUDE.md files or integration sections.
+7. **Integration guides** — look for cross-repo integration docs in any sibling repo found above (e.g., files named `*-integration.md` or similar).
 
 The subagent should return the list of doc files and what each covers.
 
