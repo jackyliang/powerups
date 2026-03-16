@@ -136,6 +136,9 @@ Plans are designed for parallel work. When a feature has independent milestones 
 6. Identify which milestones/tasks can be parallelized
 7. Begin work — spawn subagents for independent pieces
 
+### After planning (before coding)
+Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
+
 ### Resuming work (new context, no memory)
 1. Spawn an `Explore` subagent to read `plans/` and return a summary: which plan is active, what milestone you're on, what the next unchecked task is, and any key design context. **Do not read plan files directly** — they are large and will bloat your context.
 2. Use the subagent's summary to orient yourself
