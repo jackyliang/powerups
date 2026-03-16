@@ -50,10 +50,10 @@ Return a concise summary of what changed and what categories apply.
 
 ### Step 2: Identify Doc Locations
 
-Spawn an `Explore` subagent to find relevant doc files:
+Spawn an `Explore` subagent to find relevant doc files. **Start by reading the project's CLAUDE.md** — look for a "Documentation Locations" section that declares where this project's docs live, including cross-repo locations. If it exists, use it as the authoritative list. If not, discover locations manually:
 
 **Always check (local):**
-1. **CLAUDE.md** — project instructions
+1. **CLAUDE.md** — project instructions (look for a doc locations section)
 2. **README.md** — project readme
 3. **`docs/`** — in-repo guides
 4. **`.env.example`** — env var reference
@@ -61,6 +61,7 @@ Spawn an `Explore` subagent to find relevant doc files:
 **Only if `--public`:**
 5. **Public skills/plugins** — sibling directories with skill files referenced in CLAUDE.md
 6. **Downstream project docs** — other projects that integrate with this one, referenced in CLAUDE.md
+7. **Integration guides** — shared docs that cover cross-repo flows, referenced in CLAUDE.md
 
 The subagent should return the list of doc files and what each covers.
 
