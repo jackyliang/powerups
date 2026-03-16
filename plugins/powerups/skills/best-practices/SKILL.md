@@ -84,7 +84,18 @@ No mocks. Tests hit real infrastructure.
 
 **Three similar lines of code is better than a premature abstraction** — but three similar *functions* should be consolidated.
 
-### 6. Use Frontend-Design for UI Work
+### 6. Write User-Facing Copy for Humans, Not Engineers
+
+All user-facing text — UI labels, toasts, error messages, onboarding flows, tooltips, empty states — must be written so a high schooler can understand it.
+
+**Rules:**
+- No technical jargon. Say "Something went wrong" not "Internal server error (500)". Say "Couldn't save your changes" not "Write transaction failed".
+- Short and direct. One idea per sentence. If it needs a paragraph, it's too long.
+- Apple-like tone: confident, helpful, warm. Not robotic, not corporate, not cute.
+- Lead with what the user can do, not what went wrong. "Try again" beats "Request timed out".
+- Avoid implementation details leaking into copy. Users don't care about databases, tokens, or sync jobs — they care about their data and actions.
+
+### 7. Use Frontend-Design for UI Work
 
 If the change involves any frontend/UI work, use the `frontend-design` skill. This applies to:
 - New components or pages
@@ -92,7 +103,7 @@ If the change involves any frontend/UI work, use the `frontend-design` skill. Th
 - Adding visual indicators, loading states, error states
 - Any user-facing change
 
-### 7. Update Docs When Done
+### 8. Update Docs When Done
 
 After the code is complete and tests pass, run the `update-docs` skill to sync all documentation:
 - CLAUDE.md
@@ -102,7 +113,7 @@ After the code is complete and tests pass, run the `update-docs` skill to sync a
 
 Don't skip this. Stale docs cause more damage than missing docs.
 
-### 8. Lint Before Committing
+### 9. Lint Before Committing
 
 Run the project's linter before committing:
 - Python: `ruff check` / `ruff format`
@@ -117,9 +128,10 @@ Run the project's linter before committing:
 3. Ask (clarify requirements with user)
 4. TDD (red → green → refactor)
 5. DRY (search before building, extract duplicates)
-6. Frontend-design skill (if UI work)
-7. Update docs (run /update-docs)
-8. Lint (before committing)
+6. Plain-language copy (no jargon, Apple-like)
+7. Frontend-design skill (if UI work)
+8. Update docs (run /update-docs)
+9. Lint (before committing)
 ```
 
 ## Anti-Patterns
