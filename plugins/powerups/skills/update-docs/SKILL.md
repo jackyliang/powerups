@@ -1,36 +1,23 @@
 ---
 name: update-docs
-description: Invoke after completing a feature to sync documentation for the current branch's changes. Updates local/project docs by default. Use /update-docs --public to also include public skills/plugins and downstream project docs.
+description: Invoke after completing a feature to sync all documentation — local docs, sibling repos, skill plugins, and downstream project docs. Scans everything by default.
 ---
 
 # Update Docs
 
 ## Overview
 
-After shipping a feature, documentation drifts. This skill finds what's stale **for the current branch's changes** and updates it.
+After shipping a feature, documentation drifts. This skill finds what's stale and updates it — across ALL repos, not just the current one.
 
-## Scope Modes
+## When to Use
 
-| Mode | What it covers | When to use |
-|------|---------------|-------------|
-| **Default** (no flags) | Local project docs only, scoped to current branch changes | After completing a feature on a branch |
-| **`--public`** | Local docs + public skills/plugins + downstream project docs | When changes affect APIs that external agents/projects consume |
+**Invoke this skill:**
+- After completing a feature or milestone
+- After merging a PR that changes APIs, behavior, or architecture
+- When you suspect docs are stale
+- Before creating a release or PR that touches public interfaces
 
-### What counts as "local" vs "public"
-
-- **Local docs** — files in the current repo that only this project's developers see:
-  - `CLAUDE.md` — project instructions for Claude Code
-  - `README.md` — project readme
-  - `docs/` — in-repo guides
-  - `.env.example` — env var reference
-  - `plans/` — plan files with outdated status
-
-- **Public docs** — files in other repos that external agents or projects consume:
-  - Public skill plugins (sibling directories with skill files) — other agents read these to integrate
-  - Downstream project docs — other projects that reference this one
-  - Any sibling repo referenced in CLAUDE.md
-
-**Default behavior: local only.** Public docs are not touched unless `--public` or `--full` is specified.
+**The user can invoke this directly with `/update-docs`.**
 
 ## How It Works
 
@@ -48,50 +35,53 @@ Spawn an `Explore` subagent to understand the current branch's changes:
 
 Return a concise summary of what changed and what categories apply.
 
-### Step 2: Identify Doc Locations
+### Step 2: Identify ALL Doc Locations
 
-Spawn an `Explore` subagent to discover all doc files that might need updating. The skill owns this discovery — don't rely on CLAUDE.md to list locations.
+Spawn an `Explore` subagent to discover every doc file that might need updating. **Scan everything — local and cross-repo.** The whole point of this skill is comprehensive coverage.
 
-**Always check (local):**
+**Local docs (current repo):**
 1. **CLAUDE.md** — project instructions, key files tables, env var sections
 2. **README.md** — project readme
 3. **`docs/`** — in-repo guides (glob for `docs/**/*.md`)
 4. **`.env.example`** — env var reference
+5. **`plans/`** — plan files with status tables or task checkboxes
 
-**Only if `--public`:**
+**Sibling repos (always scan):**
 
-Scan CLAUDE.md for references to sibling repos and external doc locations:
-5. **Sibling skill/plugin repos** — grep CLAUDE.md for `../` paths pointing to skill directories or plugin repos. These contain docs that other agents consume and must stay in sync.
-6. **Downstream project docs** — grep CLAUDE.md for references to other projects' CLAUDE.md files or integration sections.
-7. **Integration guides** — look for cross-repo integration docs in any sibling repo found above (e.g., files named `*-integration.md` or similar).
+Grep CLAUDE.md for `../` paths to find sibling repos. For EVERY sibling repo found:
+6. **CLAUDE.md** — check for stale references to this project
+7. **README.md** — check for stale API descriptions, ports, defaults
+8. **Skill/plugin docs** — API references, recipes, guides, integration docs
+9. **Any `docs/` directory** — in-repo guides in sibling repos
 
-The subagent should return the list of doc files and what each covers.
+**This is not optional.** If CLAUDE.md references `../other-project/`, scan that project's docs too. Documentation drifts most at repo boundaries.
+
+The subagent should return the list of ALL doc files found and what each covers.
 
 ### Step 3: Diff Each Doc Against Reality
 
 For each doc file, spawn subagents (in parallel where possible) to:
 
 1. **Read the doc file**
-2. **Compare against the branch's changes** — are the described APIs, defaults, patterns, env vars, and behaviors still accurate given what changed?
+2. **Compare against the actual codebase** — are the described APIs, defaults, patterns, env vars, and behaviors still accurate?
 3. **Flag stale content** — list specific lines/sections that are wrong or outdated
 4. **Propose updates** — concrete edits, not vague suggestions
 
 Return findings as a checklist:
 ```
 - [ ] CLAUDE.md line 45: says interval_minutes defaults to 5, should be 60
-- [ ] README.md: still references manual schedule setup, should mention auto-scheduling
-- [x] docs/new-connector-guide.md: already up to date
+- [ ] ../sibling-repo/api-reference.md: missing new webhook fields
+- [ ] README.md: port 8000 should be 8001
+- [x] docs/guide.md: already up to date
 ```
 
 ### Step 4: Clarify With the User
 
-Before touching any docs, use `AskUserQuestion` to clarify:
+Before touching any docs, present the full checklist and use `AskUserQuestion` to clarify:
 
-- **Scope**: "I found 3 stale doc files. Want me to update all of them, or just specific ones?"
-- **Audience**: "The README describes this feature for external developers. Should the updated docs target the same audience, or has that changed?"
-- **Depth**: "The API reference is missing the new webhook endpoint. Should I add a full description with examples, or just a one-liner?"
-- **Tone/framing**: "The old docs describe polling as the primary sync mechanism. Should the updated docs frame webhooks as the primary and polling as a fallback, or present them as equals?"
-- **What to remove**: "The old recipes show manual schedule setup. Should I remove those entirely, or keep them as an 'advanced override' section?"
+- **Scope**: "I found 6 stale doc files across 3 repos. Want me to update all of them, or just specific ones?"
+- **Depth**: "The API reference is missing the new webhook fields. Should I add a full description with examples, or just add the fields?"
+- **What to remove**: "The old recipes show outdated defaults. Should I remove those entirely, or update them?"
 
 **Don't assume you know how the user wants their docs written.** Ask.
 
@@ -105,7 +95,7 @@ After getting user direction:
 ### Step 6: Verify
 
 After applying updates:
-- Grep for obviously stale terms across updated doc files (old endpoint names, old defaults, removed features)
+- Grep for obviously stale terms across ALL doc files (old endpoint names, old defaults, removed features)
 - Confirm no doc file references something that no longer exists
 - Report any remaining issues
 
@@ -115,12 +105,12 @@ After applying updates:
 - Env vars table: any new vars? Any removed?
 - Project structure: any new modules or files?
 - Key patterns: any changed conventions?
-- Skills table: any new skills or changed "when to use"?
+- Key files table: function names still match code?
 - Service IDs, ports, URLs: still correct?
 
 ### README.md
 - Setup instructions: still work?
-- API examples: still valid?
+- API examples: still valid? Ports correct?
 - Feature descriptions: still accurate?
 - Dependencies: any added or removed?
 
@@ -128,16 +118,15 @@ After applying updates:
 - Implementation guides: still match current code patterns?
 - Reference tables: still accurate (e.g., provider support matrix)?
 
-### Public Skills/Plugins (only with `--public` or `--full`)
-- API reference: endpoints, request/response formats, status codes
+### Sibling Repo Skill/Plugin Docs
+- API reference: endpoints, request/response formats, payload schemas
 - Workflow guides: step-by-step instructions still valid?
-- Recipes: example code still works?
-- Default values: intervals, flags, settings
+- Recipes: example code still works? Default values correct?
+- Integration guides: end-to-end flow still accurate?
 
-### Downstream Project Docs (only with `--public` or `--full`)
-- Integration sections: still accurate?
-- API URLs and env vars: still correct?
-- Behavior descriptions: match current implementation?
+### Plan Files
+- Progress/status tables: do they reflect actual completion state?
+- Task checkboxes: checked off for completed work?
 
 ## Reducing Doc Scatter
 
@@ -174,7 +163,7 @@ When you find this, **recommend consolidation** before making edits. Ask the use
 
 ## Rules
 
-- **Default scope is local + branch changes only.** Don't touch public/downstream docs unless asked.
+- **Scan everything.** Local docs AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
 - **All investigation in subagents.** Reading docs consumes context. Subagents read and return concise diffs.
 - **Ask before editing.** Show the user what's stale and get approval before making changes.
 - **Ask about framing and depth.** Use `AskUserQuestion` to clarify scope, audience, tone, and what to remove vs. keep.
@@ -190,5 +179,6 @@ When you find this, **recommend consolidation** before making edits. Ask the use
 | Endpoint additions | New endpoint added, docs not updated | Compare router files against API reference |
 | Removed features | Code deleted, docs still reference it | Grep docs for removed function/endpoint names |
 | Env vars | New var added to config.py but not to CLAUDE.md or .env.example | Compare config.py against env var tables |
-| Downstream integration notes | Upstream API changed, downstream docs stale | Use `--public` flag to catch |
+| Downstream integration notes | Upstream API changed, downstream docs stale | Scan sibling repos for stale references |
 | Scattered integration docs | Each repo partially explains the same flow | Look for the same webhook/API/flow described in 2+ places |
+| Ports and URLs | Changed in code, old values in docs/README | Grep all docs for port numbers and URLs |
