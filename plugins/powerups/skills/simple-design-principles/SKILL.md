@@ -59,6 +59,15 @@ Use the project's UI library consistently. Don't mix custom implementations with
 - Section headings within cards: `text-lg font-semibold`
 - No icons in page-level h1 titles
 
+## Project-Specific Rules
+
+This skill provides generic design principles. **Always check the project's CLAUDE.md for additional project-specific UI instructions** — these take precedence. Projects may define:
+- Page layout conventions (e.g., specific Card/CardHeader patterns for dashboard pages)
+- Color schemes (e.g., primary action color, destructive action color)
+- Required footer components
+- Loading state patterns
+- Specific component library configurations
+
 ## Quick Reference
 
 ```
