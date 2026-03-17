@@ -179,18 +179,9 @@ If code is reverted or the developer isn't happy with the implementation:
 - Progress summary shows all milestones as "Done"
 - Plan stays in `plans/` as historical record
 
-## Writing User-Facing Copy
+## UI Work
 
-All user-facing text — UI labels, toasts, error messages, onboarding flows, tooltips, empty states — must be written so a high schooler can understand it.
-
-**Rules:**
-- No technical jargon. Say "Something went wrong" not "Internal server error (500)". Say "Couldn't save your changes" not "Write transaction failed".
-- Short and direct. One idea per sentence. If it needs a paragraph, it's too long.
-- Apple-like tone: confident, helpful, warm. Not robotic, not corporate, not cute.
-- Lead with what the user can do, not what went wrong. "Try again" beats "Request timed out".
-- Avoid implementation details leaking into copy. Users don't care about databases, tokens, or sync jobs — they care about their data and actions.
-
-**When planning milestones**, flag any task that introduces user-facing text and apply these rules during implementation. Review copy in PRs with the same rigor as code.
+When any milestone involves user-facing text or UI changes, use the `simple-design-principles` skill. Flag these tasks in the plan — copy should be reviewed with the same rigor as code.
 
 ## Common Mistakes
 
