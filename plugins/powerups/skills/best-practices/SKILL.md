@@ -1,6 +1,6 @@
 ---
 name: best-practices
-description: Use for any code change — bug fix, small feature, refactor, or improvement. Ensures TDD, clarifying questions, codebase investigation, DRY, proper branching, UI skills, and doc updates. PDD invokes this automatically for large features.
+description: Use for any code change — bug fix, small feature, refactor, or improvement. Ensures TDD, clarifying questions, codebase investigation, DRY, proper branching/worktrees, UI skills, and doc updates. PDD invokes this automatically for large features.
 ---
 
 # Best-Practices-Driven Development (BPDD)
@@ -84,18 +84,26 @@ No mocks. Tests hit real infrastructure.
 
 **Three similar lines of code is better than a premature abstraction** — but three similar *functions* should be consolidated.
 
-### 6. Write User-Facing Copy for Humans, Not Engineers
+Use registry patterns for similar operations with different configurations — a dict mapping keys to functions/configs beats a chain of if/else blocks.
 
-All user-facing text — UI labels, toasts, error messages, onboarding flows, tooltips, empty states — must be written so a high schooler can understand it.
+### 6. No Backward Compatibility by Default
 
-**Rules:**
-- No technical jargon. Say "Something went wrong" not "Internal server error (500)". Say "Couldn't save your changes" not "Write transaction failed".
-- Short and direct. One idea per sentence. If it needs a paragraph, it's too long.
-- Apple-like tone: confident, helpful, warm. Not robotic, not corporate, not cute.
-- Lead with what the user can do, not what went wrong. "Try again" beats "Request timed out".
-- Avoid implementation details leaking into copy. Users don't care about databases, tokens, or sync jobs — they care about their data and actions.
+**Do NOT implement backward compatibility or legacy methods unless explicitly asked.**
 
-### 7. Use Frontend-Design for UI Work
+- When making breaking changes, ask: "Do you need backward compatibility for this change?"
+- Most of the time, the answer is no — just update all usages directly
+- Avoid: renamed variables with old aliases, deprecated function wrappers, legacy API endpoints, re-exports for old import paths
+- If old code is unused after the change, delete it completely — no `# removed` comments, no `_unused` variables
+
+### 7. Use Simple-Design-Principles for UI Work
+
+If the change involves any user-facing text or UI, use the `simple-design-principles` skill. This covers:
+- Copy and labels (plain language, no jargon)
+- Component selection (consistent UI library usage)
+- Toast messages, empty states, error messages
+- Button labels and action text
+
+### 8. Use Frontend-Design for UI Work
 
 If the change involves any frontend/UI work, use the `frontend-design` skill. This applies to:
 - New components or pages
@@ -103,7 +111,7 @@ If the change involves any frontend/UI work, use the `frontend-design` skill. Th
 - Adding visual indicators, loading states, error states
 - Any user-facing change
 
-### 8. Update Docs When Done
+### 9. Update Docs When Done
 
 After the code is complete and tests pass, run the `update-docs` skill to sync all documentation:
 - CLAUDE.md
@@ -113,7 +121,7 @@ After the code is complete and tests pass, run the `update-docs` skill to sync a
 
 Don't skip this. Stale docs cause more damage than missing docs.
 
-### 9. Lint Before Committing
+### 10. Lint Before Committing
 
 Run the project's linter before committing:
 - Python: `ruff check` / `ruff format`
@@ -123,15 +131,16 @@ Run the project's linter before committing:
 ## Quick Reference
 
 ```
-1. Branch (never main)
-2. Investigate (subagent — what exists?)
-3. Ask (clarify requirements with user)
-4. TDD (red → green → refactor)
-5. DRY (search before building, extract duplicates)
-6. Plain-language copy (no jargon, Apple-like)
-7. Frontend-design skill (if UI work)
-8. Update docs (run /update-docs)
-9. Lint (before committing)
+1.  Branch (never main)
+2.  Investigate (subagent — what exists?)
+3.  Ask (clarify requirements with user)
+4.  TDD (red → green → refactor)
+5.  DRY (search before building, extract duplicates)
+6.  No backward compat (unless explicitly asked)
+7.  Simple-design-principles (if UI/copy work)
+8.  Frontend-design skill (if UI work)
+9.  Update docs (run /update-docs)
+10. Lint (before committing)
 ```
 
 ## Anti-Patterns
@@ -145,6 +154,8 @@ Run the project's linter before committing:
 | Copy-paste similar code | Extract shared utility |
 | Build custom infrastructure when a dependency handles it | Check third-party capabilities first |
 | Default to the easier approach | Present options, recommend the better one |
-| Keep old code "just in case" | Ask about backwards compat — usually delete |
+| Keep old code "just in case" | Delete it — no backward compat by default |
+| Add backward compat shims without asking | Ask the user first — usually not needed |
+| Write UI copy with technical jargon | Use simple-design-principles skill |
 | Skip docs because "it's a small change" | Run /update-docs — small changes cause drift too |
 | Write UI code without frontend-design skill | Always use it for user-facing changes |
