@@ -186,6 +186,10 @@ If code is reverted or the developer isn't happy with the implementation:
 
 When any milestone involves user-facing text or UI changes, use the `simple-design-principles` skill. Flag these tasks in the plan — copy should be reviewed with the same rigor as code.
 
+## API Work
+
+When any milestone involves creating or modifying API endpoints, use the `self-documenting-apis` skill. Every endpoint should have docstrings and typed response models so auto-generated docs (`/docs`, `/redoc`) are the single source of truth — no separate API reference file to maintain.
+
 ## Common Mistakes
 
 | Mistake | Fix |

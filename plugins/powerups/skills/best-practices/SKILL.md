@@ -111,9 +111,21 @@ If the change involves any frontend/UI work, use the `frontend-design` skill. Th
 - Adding visual indicators, loading states, error states
 - Any user-facing change
 
-### 9. Update Docs When Done
+### 9. Self-Documenting APIs
+
+If the change involves API endpoints (new or modified), use the `self-documenting-apis` skill. This ensures:
+- Endpoint docstrings (description, context, side effects)
+- Typed response models with `Field(description=...)`
+- Typed request models with field descriptions
+- Proper status codes and error responses
+- Router tags for grouping
+
+Auto-generated docs (`/docs`, `/redoc`) should be the only API reference — no separate doc file to maintain.
+
+### 10. Update Docs When Done
 
 After the code is complete and tests pass, run the `update-docs` skill to sync all documentation:
+
 - CLAUDE.md
 - README
 - Public skills/plugins
@@ -121,7 +133,7 @@ After the code is complete and tests pass, run the `update-docs` skill to sync a
 
 Don't skip this. Stale docs cause more damage than missing docs.
 
-### 10. Lint Before Committing
+### 11. Lint Before Committing
 
 Run the project's linter before committing:
 - Python: `ruff check` / `ruff format`
@@ -139,8 +151,9 @@ Run the project's linter before committing:
 6.  No backward compat (unless explicitly asked)
 7.  Simple-design-principles (if UI/copy work)
 8.  Frontend-design skill (if UI work)
-9.  Update docs (run /update-docs)
-10. Lint (before committing)
+9.  Self-documenting APIs (if API work)
+10. Update docs (run /update-docs)
+11. Lint (before committing)
 ```
 
 ## Anti-Patterns
@@ -159,3 +172,5 @@ Run the project's linter before committing:
 | Write UI copy with technical jargon | Use simple-design-principles skill |
 | Skip docs because "it's a small change" | Run /update-docs — small changes cause drift too |
 | Write UI code without frontend-design skill | Always use it for user-facing changes |
+| Maintain a separate api-reference.md | Use `self-documenting-apis` — code is the docs |
+| Return raw dicts from API endpoints | Define typed response models |
