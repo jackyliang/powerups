@@ -103,7 +103,13 @@ If any other test broke, fix the regression **without breaking the original fix*
 
 **Success criteria:** No debug artifacts remain in the diff.
 
-### Step 9: Commit and PR
+### Step 9: Update change log
+
+**Run `powerups:change-log`** — add an entry to `plans/change-log.md` describing the fix in plain, business-user-friendly language. Skip this step only if the fix is purely internal (not user-facing).
+
+**Success criteria:** `plans/change-log.md` has a new entry for today's date.
+
+### Step 10: Commit and PR
 
 ```bash
 git add <specific files>
