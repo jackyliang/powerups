@@ -55,7 +55,7 @@ Use the project's UI library consistently. Don't mix custom implementations with
 
 - Action buttons: use the project's primary color (e.g., indigo-500)
 - Destructive actions: use red with AlertDialog confirmation
-- Loading states: spinner with muted color
+- Loading states: use skeleton placeholders that match the shape of the content being loaded, not spinners. Skeletons feel faster and reduce layout shift. Reserve spinners only for inline actions (e.g., a button that's processing).
 - Section headings within cards: `text-lg font-semibold`
 - No icons in page-level h1 titles
 
