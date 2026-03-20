@@ -1,6 +1,6 @@
 {
   "name": "powerups",
-  "description": "Reusable Claude Code skills for disciplined software development: best practices, TDD, plan-driven development, database branching, self-documenting APIs, and doc updates.",
+  "description": "Reusable Claude Code skills for disciplined software development.",
   "version": "1.4.0",
   "author": {
     "name": "jackyliang"

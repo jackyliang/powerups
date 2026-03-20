@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "powerups",
-      "description": "TDD, plan-driven development, database branching, and self-documenting API skills for Claude Code.",
+      "description": "Reusable Claude Code skills for disciplined software development.",
       "version": "1.4.0",
       "source": "./plugins/powerups",
       "category": "development"
