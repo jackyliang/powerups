@@ -141,9 +141,24 @@ Plans are designed for parallel work. When a feature has independent milestones 
 1. Check `plans/` — find the next version number
 2. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
 3. **Invoke `powerups:best-practices`** — this is not optional. Run the skill to ensure branching, codebase investigation (subagent), and clarifying questions all happen before any code or plan is written. Do not just reference it — actually invoke it.
-4. Create `plans/v{N}-{description}.md`
-5. Write Context, Design, and Milestones sections
-6. Get user approval on the plan before coding
+4. **Skill audit — MANDATORY before writing the plan.** List every available powerups skill by name, then for each one, explicitly state whether it applies to this feature and why. Output this analysis to the user before proceeding. This ensures no skill is forgotten during planning or implementation.
+
+   Example output:
+   ```
+   Skill audit for v10-sync-change-details:
+   - best-practices: YES — always applies (already invoked)
+   - test-driven-development: YES — new backend logic needs tests
+   - simple-design-principles: YES — frontend UI with user-facing copy
+   - self-documenting-apis: YES — new API endpoint
+   - database-branching: NO — not using Ghost DB
+   - update-docs: YES — run after all milestones complete
+   - bug-fix: NO — this is a new feature, not a bug fix
+   ```
+
+   **Every skill marked YES must appear as an explicit task or note in the relevant milestone.** If `update-docs` applies, it MUST appear as a task in the final milestone or as a post-completion step. Do not rely on remembering — write it into the plan.
+5. Create `plans/v{N}-{description}.md`
+6. Write Context, Design, and Milestones sections — include skill-specific tasks identified in step 4
+7. Get user approval on the plan before coding
 7. Identify which milestones/tasks can be parallelized
 8. Begin work — spawn subagents for independent pieces
 
@@ -179,7 +194,8 @@ When a milestone is complete (all tasks checked), **stop and let the user test m
 This ensures the user validates each milestone incrementally rather than discovering issues after everything is built.
 
 ### After all milestones complete
-- Run the `update-docs` skill to sync all documentation
+- **Execute every skill marked YES in the skill audit.** Go back to your skill audit output and confirm each one was actually used. If any was missed, execute it now before creating the PR.
+- Run the `update-docs` skill to sync all documentation — this is NOT optional
 - Run the project's linter
 - Create PR
 
@@ -218,3 +234,5 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Treating PDD as a replacement for best-practices | PDD = `powerups:best-practices` + plans. Actually invoke the skill — don't just follow it from memory |
 | Jumping straight to coding after writing the plan | Follow best-practices: create branch, investigate codebase, ask clarifying questions FIRST |
 | Writing the plan file or implementing on `main` | **Always create a feature branch before writing anything** — plans and code both go on branches, never `main` |
+| Skipping the skill audit before writing the plan | **Always run the skill audit (step 4)** — list every powerups skill, decide YES/NO for each, and write YES skills into the plan as tasks |
+| Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
