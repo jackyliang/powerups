@@ -1,13 +1,13 @@
 ---
 name: change-log
-description: Use after completing a feature or bug fix to log the change in plans/change-log.md using plain, business-user-friendly language
+description: Use after completing a feature or bug fix to log the change in CHANGELOG.md using plain, business-user-friendly language
 ---
 
 # Change Log
 
 ## Overview
 
-After every feature or bug fix is complete, add an entry to `plans/change-log.md`. The log is written for business users, not developers — it powers the product updates blog. Use plain language that a non-technical person would understand.
+After every feature or bug fix is complete, add an entry to `CHANGELOG.md`. The log is written for business users, not developers — it powers the product updates blog. Use plain language that a non-technical person would understand.
 
 ## When to Use
 
@@ -32,7 +32,7 @@ After every feature or bug fix is complete, add an entry to `plans/change-log.md
 - **One entry per feature or fix.** One sentence. Two sentences max for small features. Up to three sentences for large features.
 - **Use `simple-design-principles` language.** No jargon, no technical terms. Write what the user can now do or what got better, not what code changed.
 - **Date format:** `YYYY-MM-DD`. Use today's date.
-- **File location:** `plans/change-log.md`. Create it if it doesn't exist.
+- **File location:** `CHANGELOG.md`. Create it if it doesn't exist.
 - **Append new dates at the top** (most recent first), below the `# Change Log` heading.
 - **Group entries under the same date** if multiple changes ship on the same day.
 - **Don't log the same change twice.** If a feature spans multiple milestones, log it once when the full feature is complete.
