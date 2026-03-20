@@ -33,6 +33,8 @@ powerups/
 └── README.md
 ```
 
-## Updating README
+## Updating README — MANDATORY
 
-When adding or removing a skill, update the skills table in `README.md` to match.
+When adding, removing, or significantly changing a skill, you MUST update the skills table in `README.md` to match. This is part of every commit that changes skills, not a separate step.
+
+**Why:** The README is the first thing users see on GitHub. If it lists outdated skills or missing descriptions, users won't know what's available. This has happened repeatedly — new skills were added but never listed in README.
