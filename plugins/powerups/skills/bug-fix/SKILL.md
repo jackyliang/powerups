@@ -60,6 +60,11 @@ Now that you have a reproduction, investigate **why** it happens.
 - Read the code paths identified in Step 2 more carefully
 - Add temporary debug logging if needed (`logger.debug` or `print`) to narrow down the issue
 - Check edge cases: null inputs, empty collections, type mismatches, race conditions
+- **For UI bugs:** Ask the user if you can use Chrome browser tools (`mcp__claude-in-chrome__*`) to debug. If available, use them to:
+  - Execute JavaScript in the page to inspect state, test API calls, or check variable values
+  - Read console messages for errors or warnings
+  - Read network requests to verify API responses, status codes, and payloads
+  - Visually inspect the page to confirm what the user is seeing
 
 **Success criteria:** You can point to the exact line(s) of code causing the bug and explain the root cause.
 
