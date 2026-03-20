@@ -9,9 +9,9 @@ description: Use when starting a multi-milestone feature, resuming work after co
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
-**PDD builds on `best-practices` — read it first if you haven't.** Every practice in the `best-practices` skill is mandatory here: TDD (tests before implementation), branching (never develop on main), investigation (subagent before building), clarifying questions (ask before assuming), DRY, frontend-design for UI, self-documenting APIs, update-docs when done. PDD adds planning infrastructure on top — it does NOT replace or relax any of those practices.
+**PDD requires `powerups:best-practices` — invoke it, don't just reference it.** Every practice in `powerups:best-practices` is mandatory here: TDD (tests before implementation), branching (never develop on main), investigation (subagent before building), clarifying questions (ask before assuming), DRY, frontend-design for UI, self-documenting APIs, update-docs when done. PDD adds planning infrastructure on top — it does NOT replace or relax any of those practices.
 
-**If you're unsure whether a best-practice applies:** it does. PDD is best-practices + plans, not plans instead of best-practices.
+**If you're unsure whether a best-practice applies:** it does. PDD is `powerups:best-practices` + plans, not plans instead of `powerups:best-practices`.
 
 ## When to Use
 
@@ -140,7 +140,7 @@ Plans are designed for parallel work. When a feature has independent milestones 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
 2. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
-3. **Follow `best-practices` steps 1–3** — investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
+3. **Invoke `powerups:best-practices`** — this is not optional. Run the skill to ensure branching, codebase investigation (subagent), and clarifying questions all happen before any code or plan is written. Do not just reference it — actually invoke it.
 4. Create `plans/v{N}-{description}.md`
 5. Write Context, Design, and Milestones sections
 6. Get user approval on the plan before coding
@@ -157,7 +157,7 @@ Run `/update-docs` to check if the plan itself revealed stale documentation (e.g
 4. Continue working, checking off tasks as you go
 
 ### During implementation
-- **All `best-practices` apply at the task level** — TDD (write failing test, then implement), DRY (search before building), investigation (understand before changing). The plan organizes the work; best-practices govern how each task is executed.
+- **Invoke `powerups:best-practices` at the task level** — TDD (write failing test, then implement), DRY (search before building), investigation (understand before changing). The plan organizes the work; `powerups:best-practices` governs how each task is executed. Actually invoke the skill, don't just follow it from memory.
 - Check off each task immediately when done: `- [ ]` → `- [x]`
 - Update the progress summary table when a milestone completes
 - If you discover new work, add tasks to the appropriate milestone
@@ -215,6 +215,6 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Skipping investigation/questions because "I know the codebase" | Always follow `best-practices` steps — investigate and ask first |
 | Listing implementation tasks before test tasks in milestones | TDD is the default — test tasks come first. Only skip if the user explicitly opts out |
 | Writing a plan with no tests at all | Every milestone that adds behavior needs test tasks. If you forgot them, add them before starting implementation |
-| Treating PDD as a replacement for best-practices | PDD = best-practices + plans. Branch, investigate, ask, TDD, DRY, lint, update-docs — all still required |
+| Treating PDD as a replacement for best-practices | PDD = `powerups:best-practices` + plans. Actually invoke the skill — don't just follow it from memory |
 | Jumping straight to coding after writing the plan | Follow best-practices: create branch, investigate codebase, ask clarifying questions FIRST |
 | Writing the plan file or implementing on `main` | **Always create a feature branch before writing anything** — plans and code both go on branches, never `main` |
