@@ -139,12 +139,13 @@ Plans are designed for parallel work. When a feature has independent milestones 
 
 ### Starting a new feature
 1. Check `plans/` — find the next version number
-2. **Follow `best-practices` steps 1–3** — create branch, investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
-3. Create `plans/v{N}-{description}.md`
-4. Write Context, Design, and Milestones sections
-5. Get user approval on the plan before coding
-6. Identify which milestones/tasks can be parallelized
-7. Begin work — spawn subagents for independent pieces
+2. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
+3. **Follow `best-practices` steps 1–3** — investigate the codebase (subagent), ask clarifying questions (scope, tradeoffs, backwards compat, stakeholders). Do not skip this.
+4. Create `plans/v{N}-{description}.md`
+5. Write Context, Design, and Milestones sections
+6. Get user approval on the plan before coding
+7. Identify which milestones/tasks can be parallelized
+8. Begin work — spawn subagents for independent pieces
 
 ### After planning (before coding)
 Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
@@ -216,3 +217,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Writing a plan with no tests at all | Every milestone that adds behavior needs test tasks. If you forgot them, add them before starting implementation |
 | Treating PDD as a replacement for best-practices | PDD = best-practices + plans. Branch, investigate, ask, TDD, DRY, lint, update-docs — all still required |
 | Jumping straight to coding after writing the plan | Follow best-practices: create branch, investigate codebase, ask clarifying questions FIRST |
+| Writing the plan file or implementing on `main` | **Always create a feature branch before writing anything** — plans and code both go on branches, never `main` |
