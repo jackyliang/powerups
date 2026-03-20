@@ -9,7 +9,9 @@ description: Use when starting a multi-milestone feature, resuming work after co
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
-**PDD builds on `best-practices`.** Everything in the `best-practices` skill applies here automatically — TDD, investigation, clarifying questions, DRY, branching, frontend-design for UI, update-docs when done. PDD adds planning infrastructure on top.
+**PDD builds on `best-practices` — read it first if you haven't.** Every practice in the `best-practices` skill is mandatory here: TDD (tests before implementation), branching (never develop on main), investigation (subagent before building), clarifying questions (ask before assuming), DRY, frontend-design for UI, self-documenting APIs, update-docs when done. PDD adds planning infrastructure on top — it does NOT replace or relax any of those practices.
+
+**If you're unsure whether a best-practice applies:** it does. PDD is best-practices + plans, not plans instead of best-practices.
 
 ## When to Use
 
@@ -76,18 +78,26 @@ The core of the plan. Each milestone is a logical chunk of work with:
 ### Milestone N: Short Name
 **Goal:** One sentence.
 
-- [ ] Task 1 description
-- [ ] Task 2 description
-- [x] Task 3 (completed)
+Tests first (these will fail until implementation):
+- [ ] Write failing tests for X
+- [ ] Write failing tests for Y
+
+Then implement to make tests pass:
+- [ ] Implement X
+- [ ] Implement Y
 
 **Verification:**
 - [ ] How to confirm this milestone is done
 ```
 
+**TDD is required by default.** Every milestone that adds or changes behavior MUST list test tasks before implementation tasks. Tests are written first, confirmed to fail, then implementation makes them pass. This is non-negotiable unless the user explicitly opts out (e.g., "skip tests", "no tests for this"). If the user hasn't said to skip tests, include them.
+
+Milestones that are pure refactors of already-tested code (e.g., moving code without changing behavior) don't need new tests — but existing tests must still pass.
+
 Rules:
 - Tasks are concrete and actionable ("Create `sync_hq/auth/models.py`" not "Set up auth")
 - Include file paths where relevant
-- TDD: list test tasks before implementation tasks
+- **Test tasks come before implementation tasks within each milestone** — this is the TDD ordering
 - Check off tasks (`- [x]`) as they are completed
 - Never remove completed tasks — they're the history
 
@@ -146,6 +156,7 @@ Run `/update-docs` to check if the plan itself revealed stale documentation (e.g
 4. Continue working, checking off tasks as you go
 
 ### During implementation
+- **All `best-practices` apply at the task level** — TDD (write failing test, then implement), DRY (search before building), investigation (understand before changing). The plan organizes the work; best-practices govern how each task is executed.
 - Check off each task immediately when done: `- [ ]` → `- [x]`
 - Update the progress summary table when a milestone completes
 - If you discover new work, add tasks to the appropriate milestone
@@ -201,3 +212,7 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Running all tasks sequentially | Identify independent work and spawn subagents |
 | Skipping investigation/questions because "I know the codebase" | Always follow `best-practices` steps — investigate and ask first |
+| Listing implementation tasks before test tasks in milestones | TDD is the default — test tasks come first. Only skip if the user explicitly opts out |
+| Writing a plan with no tests at all | Every milestone that adds behavior needs test tasks. If you forgot them, add them before starting implementation |
+| Treating PDD as a replacement for best-practices | PDD = best-practices + plans. Branch, investigate, ask, TDD, DRY, lint, update-docs — all still required |
+| Jumping straight to coding after writing the plan | Follow best-practices: create branch, investigate codebase, ask clarifying questions FIRST |
