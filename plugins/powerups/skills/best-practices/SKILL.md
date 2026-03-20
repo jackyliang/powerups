@@ -133,7 +133,18 @@ After the code is complete and tests pass, run the `update-docs` skill to sync a
 
 Don't skip this. Stale docs cause more damage than missing docs.
 
-### 11. Lint Before Committing
+### 11. Simplify After Implementation
+
+After the code is working and tests pass, run `/simplify` to review changed code for reuse, quality, and efficiency. This catches:
+- Duplicate code that should be extracted
+- N+1 queries and missed batch operations
+- React anti-patterns (components defined inside render)
+- Stringly-typed code where types exist
+- Copy-paste with slight variation
+
+Fix issues found, then proceed to docs and lint.
+
+### 12. Lint Before Committing
 
 Run the project's linter before committing:
 - Python: `ruff check` / `ruff format`
@@ -153,7 +164,8 @@ Run the project's linter before committing:
 8.  Frontend-design skill (if UI work)
 9.  Self-documenting APIs (if API work)
 10. Update docs (run /update-docs)
-11. Lint (before committing)
+11. Simplify (run /simplify after implementation)
+12. Lint (before committing)
 ```
 
 ## Anti-Patterns

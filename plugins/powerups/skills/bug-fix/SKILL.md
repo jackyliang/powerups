@@ -103,13 +103,19 @@ If any other test broke, fix the regression **without breaking the original fix*
 
 **Success criteria:** No debug artifacts remain in the diff.
 
-### Step 9: Update change log
+### Step 9: Simplify
 
-**Run `powerups:change-log`** — add an entry to `plans/change-log.md` describing the fix in plain, business-user-friendly language. Skip this step only if the fix is purely internal (not user-facing).
+**Run `/simplify`** — review changed code for reuse, quality, and efficiency. Fix issues found.
 
-**Success criteria:** `plans/change-log.md` has a new entry for today's date.
+**Success criteria:** No duplicate code, N+1 queries, or anti-patterns in the diff.
 
-### Step 10: Commit and PR
+### Step 10: Update change log
+
+**Run `powerups:change-log`** — add an entry to `CHANGELOG.md` describing the fix in plain, business-user-friendly language. Skip this step only if the fix is purely internal (not user-facing).
+
+**Success criteria:** `CHANGELOG.md` has a new entry for today's date.
+
+### Step 11: Commit and PR
 
 ```bash
 git add <specific files>

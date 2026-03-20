@@ -195,7 +195,8 @@ This ensures the user validates each milestone incrementally rather than discove
 
 ### After all milestones complete
 - **Execute every skill marked YES in the skill audit.** Go back to your skill audit output and confirm each one was actually used. If any was missed, execute it now before creating the PR.
-- **Run `powerups:change-log`** — add an entry to `plans/change-log.md` describing the feature in plain, business-user-friendly language. This is NOT optional for user-facing changes.
+- **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix issues found.
+- **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` describing the feature in plain, business-user-friendly language. This is NOT optional for user-facing changes.
 - Run the `update-docs` skill to sync all documentation — this is NOT optional
 - Run the project's linter
 - Create PR
