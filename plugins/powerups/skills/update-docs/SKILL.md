@@ -85,6 +85,8 @@ Before touching any docs, present the full checklist and use `AskUserQuestion` t
 
 **Don't assume you know how the user wants their docs written.** Ask.
 
+**Never silently skip a finding.** If a doc file is stale, present it to the user — even if you think the update is minor or optional. Let the user decide what to skip, not you.
+
 ### Step 5: Apply Updates
 
 After getting user direction:
@@ -116,7 +118,9 @@ After applying updates:
 
 ### In-Repo Guides (`docs/`)
 - Implementation guides: still match current code patterns?
+- **Pipeline/flow descriptions**: if you added a new step to a pipeline (e.g., a new stage in a data processing flow), check that any docs listing those steps are updated. Numbered step lists go stale silently.
 - Reference tables: still accurate (e.g., provider support matrix)?
+- "How to add a new X" guides: do they still describe the full process, including any new automatic behaviors the developer should know about?
 
 ### Sibling Repo Skill/Plugin Docs
 - API reference: endpoints, request/response formats, payload schemas
