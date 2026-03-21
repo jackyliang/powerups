@@ -32,7 +32,7 @@ After every feature or bug fix is complete, add an entry to `CHANGELOG.md`. The 
 - **One entry per feature or fix.** One sentence. Two sentences max for small features. Up to three sentences for large features.
 - **Use `simple-design-principles` language.** No jargon, no technical terms. Write what the user can now do or what got better, not what code changed.
 - **Date format:** `YYYY-MM-DD`. Use today's date.
-- **File location:** `CHANGELOG.md`. Create it if it doesn't exist.
+- **File location:** `CHANGELOG.md` at the project root. **Always search for an existing `CHANGELOG.md` first** (e.g., using Glob) before creating a new one — never create a duplicate.
 - **Append new dates at the top** (most recent first), below the `# Change Log` heading.
 - **Group entries under the same date** if multiple changes ship on the same day.
 - **Don't log the same change twice.** If a feature spans multiple milestones, log it once when the full feature is complete.
