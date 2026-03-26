@@ -199,6 +199,7 @@ This ensures the user validates each milestone incrementally rather than discove
 - **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` describing the feature in plain, business-user-friendly language. This is NOT optional for user-facing changes.
 - Run the `update-docs` skill to sync all documentation — this is NOT optional
 - Run the project's linter
+- **Run the full test suite** — `pytest` (or the project's test command). ALL tests must pass before creating the PR. This catches regressions where new code breaks existing tests, or where tests and code were updated inconsistently (e.g., table name changes that affect both production code and test fixtures). Do not skip this step — a green test suite is a hard gate for PR creation.
 - Create PR
 
 ### Rolling back work
@@ -238,3 +239,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Writing the plan file or implementing on `main` | **Always create a feature branch before writing anything** — plans and code both go on branches, never `main` |
 | Skipping the skill audit before writing the plan | **Always run the skill audit (step 4)** — list every powerups skill, decide YES/NO for each, and write YES skills into the plan as tasks |
 | Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
+| Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
