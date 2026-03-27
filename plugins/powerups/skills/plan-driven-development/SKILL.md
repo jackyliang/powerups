@@ -143,10 +143,11 @@ Plans are designed for parallel work. When a feature has independent milestones 
 ## Workflow
 
 ### Starting a new feature
-1. Check `plans/` — find the next version number
-2. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
-3. **Invoke `powerups:best-practices`** — this is not optional. Run the skill to ensure branching, codebase investigation (subagent), and clarifying questions all happen before any code or plan is written. Do not just reference it — actually invoke it.
-4. **Skill audit — MANDATORY before writing the plan.** List every available powerups skill by name, then for each one, explicitly state whether it applies to this feature and why. Output this analysis to the user before proceeding. This ensures no skill is forgotten during planning or implementation.
+1. **Set `/effort max`** — planning requires deep reasoning. Always use max effort during the planning phase.
+2. Check `plans/` — find the next version number
+3. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
+4. **Invoke `powerups:best-practices`** — this is not optional. Run the skill to ensure branching, codebase investigation (subagent), impact scan, and clarifying questions all happen before any code or plan is written. Do not just reference it — actually invoke it.
+5. **Skill audit — MANDATORY before writing the plan.** List every available powerups skill by name, then for each one, explicitly state whether it applies to this feature and why. Output this analysis to the user before proceeding. This ensures no skill is forgotten during planning or implementation.
 
    Example output:
    ```
@@ -161,11 +162,11 @@ Plans are designed for parallel work. When a feature has independent milestones 
    ```
 
    **Every skill marked YES must appear as an explicit task or note in the relevant milestone.** If `update-docs` applies, it MUST appear as a task in the final milestone or as a post-completion step. Do not rely on remembering — write it into the plan.
-5. Create `plans/v{N}-{description}.md`
-6. Write Context, Design, and Milestones sections — include skill-specific tasks identified in step 4
-7. Get user approval on the plan before coding
-7. Identify which milestones/tasks can be parallelized
-8. Begin work — spawn subagents for independent pieces
+6. Create `plans/v{N}-{description}.md`
+7. Write Context, Design, and Milestones sections — include skill-specific tasks identified in step 5
+8. Get user approval on the plan before coding
+9. Identify which milestones/tasks can be parallelized
+10. Begin work — spawn subagents for independent pieces
 
 ### After planning (before coding)
 Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
