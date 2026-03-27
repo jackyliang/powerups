@@ -39,7 +39,37 @@ git checkout -b feature/name
 **Subagent prompt template:**
 > "Investigate the codebase for [feature/problem]. Check: (1) does similar code already exist, (2) do existing services or third-party deps already handle this, (3) what patterns are used for similar features. Return a concise summary under 30 lines."
 
-### 3. Ask Before You Assume
+### 3. Impact Scan Before Changing Existing Code
+
+**Before modifying any existing function, API, database schema, or shared utility, run 3 parallel subagents to exhaustively scan everything that depends on it.** This prevents incomplete changes that break existing code.
+
+This is mandatory whenever you are:
+- Changing a function signature (parameters, defaults, return type)
+- Changing behavior of an existing function (parallelism, batch sizes, side effects)
+- Adding/removing/renaming a database column or table
+- Modifying a shared utility, helper, or base class
+- Changing an API endpoint's request/response shape
+
+**Run all 3 scans in parallel as `general-purpose` subagents:**
+
+**Scan 1 — Callers:**
+> "I'm modifying [function/module]. Find EVERY import and call site across the entire codebase. Check: (1) every file that imports it, including aliased imports, (2) every direct and indirect call site with file path and line number, (3) any hardcoded values matching current defaults I'm changing, (4) related functions in the same module with similar patterns, (5) scheduled jobs, cron handlers, background tasks, or webhooks that trigger this code path. For each: file path, line number, exact usage, whether it needs updating."
+
+**Scan 2 — Data:**
+> "I'm modifying [table/column/query]. Find EVERY database interaction across the entire codebase. Check: (1) every query that reads/writes the affected table(s), (2) every column reference in SELECTs, INSERTs, UPDATEs, WHERE clauses, JOINs, (3) every ORM model, typed dict, or Pydantic model mapping to this table, (4) every RPC/function call that touches this data, (5) every place that constructs rows or dicts matching the table schema. For each: file path, line number, exact usage, whether it needs updating."
+
+**Scan 3 — Tests:**
+> "I'm modifying [function/module]. Find EVERY test dependency across the entire codebase. Check: (1) every test file that imports or calls the changed function, (2) every fixture that sets up data for this code path, (3) every assertion that depends on current behavior (return values, side effects, batch sizes), (4) every mock or patch targeting the changed function, (5) integration tests exercising this code path end-to-end. For each: file path, test name, what it tests, whether it needs updating."
+
+**What to do with the results:**
+- Merge findings from all 3 scans into a single impact picture
+- If using PDD, add a "Callers Impacted" section to the plan
+- If not using a plan, verify each caller is handled before marking the work done
+- Update any caller that passes explicit values matching old defaults you're changing
+
+**This is NOT the same as practice #2 (Investigate Before Building).** Practice #2 asks "does similar code exist?" to avoid reinventing. This practice asks "what will break when I change this?" to avoid incomplete changes.
+
+### 4. Ask Before You Assume (was #3)
 
 **Use `AskUserQuestion` to clarify before building.** Don't guess at requirements, scope, or approach.
 
@@ -56,7 +86,7 @@ Ask about:
 - If you're about to make a product decision, surface it. The user's priorities may differ from yours.
 - Batch related questions into one message.
 
-### 4. Test-Driven Development
+### 5. Test-Driven Development
 
 **Write failing tests first, then implement.** No exceptions. Use the `test-driven-development` skill.
 
@@ -67,7 +97,7 @@ The cycle:
 
 No mocks. Tests hit real infrastructure.
 
-### 5. DRY — Don't Repeat Yourself
+### 6. DRY — Don't Repeat Yourself
 
 **Before implementing anything, search for existing code that does the same or similar thing.** Spawn an `Explore` subagent to look:
 
@@ -86,7 +116,7 @@ No mocks. Tests hit real infrastructure.
 
 Use registry patterns for similar operations with different configurations — a dict mapping keys to functions/configs beats a chain of if/else blocks.
 
-### 6. No Backward Compatibility by Default
+### 7. No Backward Compatibility by Default
 
 **Do NOT implement backward compatibility or legacy methods unless explicitly asked.**
 
@@ -95,7 +125,7 @@ Use registry patterns for similar operations with different configurations — a
 - Avoid: renamed variables with old aliases, deprecated function wrappers, legacy API endpoints, re-exports for old import paths
 - If old code is unused after the change, delete it completely — no `# removed` comments, no `_unused` variables
 
-### 7. Use Simple-Design-Principles for UI Work
+### 8. Use Simple-Design-Principles for UI Work
 
 If the change involves any user-facing text or UI, use the `simple-design-principles` skill. This covers:
 - Copy and labels (plain language, no jargon)
@@ -103,7 +133,7 @@ If the change involves any user-facing text or UI, use the `simple-design-princi
 - Toast messages, empty states, error messages
 - Button labels and action text
 
-### 8. Use Frontend-Design for UI Work
+### 9. Use Frontend-Design for UI Work
 
 If the change involves any frontend/UI work, use the `frontend-design` skill. This applies to:
 - New components or pages
@@ -111,7 +141,7 @@ If the change involves any frontend/UI work, use the `frontend-design` skill. Th
 - Adding visual indicators, loading states, error states
 - Any user-facing change
 
-### 9. Self-Documenting APIs
+### 10. Self-Documenting APIs
 
 If the change involves API endpoints (new or modified), use the `self-documenting-apis` skill. This ensures:
 - Endpoint docstrings (description, context, side effects)
@@ -122,7 +152,7 @@ If the change involves API endpoints (new or modified), use the `self-documentin
 
 Auto-generated docs (`/docs`, `/redoc`) should be the only API reference — no separate doc file to maintain.
 
-### 10. Update Docs When Done
+### 11. Update Docs When Done
 
 After the code is complete and tests pass, run the `update-docs` skill to sync all documentation:
 
@@ -133,7 +163,7 @@ After the code is complete and tests pass, run the `update-docs` skill to sync a
 
 Don't skip this. Stale docs cause more damage than missing docs.
 
-### 11. Simplify After Implementation
+### 12. Simplify After Implementation
 
 After the code is working and tests pass, run `/simplify` to review changed code for reuse, quality, and efficiency. This catches:
 - Duplicate code that should be extracted
@@ -144,7 +174,7 @@ After the code is working and tests pass, run `/simplify` to review changed code
 
 Fix issues found, then proceed to docs and lint.
 
-### 12. Lint Before Committing
+### 13. Lint Before Committing
 
 Run the project's linter before committing:
 - Python: `ruff check` / `ruff format`
@@ -156,16 +186,17 @@ Run the project's linter before committing:
 ```
 1.  Branch (never main)
 2.  Investigate (subagent — what exists?)
-3.  Ask (clarify requirements with user)
-4.  TDD (red → green → refactor)
-5.  DRY (search before building, extract duplicates)
-6.  No backward compat (unless explicitly asked)
-7.  Simple-design-principles (if UI/copy work)
-8.  Frontend-design skill (if UI work)
-9.  Self-documenting APIs (if API work)
-10. Update docs (run /update-docs)
-11. Simplify (run /simplify after implementation)
-12. Lint (before committing)
+3.  Impact scan (3 parallel subagents — what will break?)
+4.  Ask (clarify requirements with user)
+5.  TDD (red → green → refactor)
+6.  DRY (search before building, extract duplicates)
+7.  No backward compat (unless explicitly asked)
+8.  Simple-design-principles (if UI/copy work)
+9.  Frontend-design skill (if UI work)
+10. Self-documenting APIs (if API work)
+11. Update docs (run /update-docs)
+12. Simplify (run /simplify after implementation)
+13. Lint (before committing)
 ```
 
 ## Anti-Patterns
@@ -174,6 +205,8 @@ Run the project's linter before committing:
 |-------|-----|
 | Commit to main | Create a branch first |
 | Start coding without checking what exists | Spawn Explore subagent first |
+| Change a function without scanning for all callers | Run 3 parallel impact scan subagents first |
+| Assume only the obvious files are affected | The scan always finds surprising callers — cron jobs, background tasks, shared utilities |
 | Guess what the user wants | Ask with `AskUserQuestion` |
 | Write tests after implementation | Write failing tests first (TDD) |
 | Copy-paste similar code | Extract shared utility |

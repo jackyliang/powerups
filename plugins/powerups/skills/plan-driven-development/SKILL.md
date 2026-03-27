@@ -1,6 +1,6 @@
 ---
 name: plan-driven-development
-description: Use when starting a multi-milestone feature, resuming work after context loss, or unsure if a feature plan already exists
+description: Use when starting any feature (small or large), resuming work after context loss, or unsure if a feature plan already exists. For smaller features, use lightweight mode (no plan file, but all PDD rules still apply).
 ---
 
 # Plan-Driven Development
@@ -15,15 +15,20 @@ Large features get a versioned plan file in `plans/` that serves as the **single
 
 ## When to Use
 
-**Create a plan when:**
+PDD can be invoked for features of any size. The difference is whether you write a plan file.
+
+**Write a plan file (`plans/v{N}-*.md`) when:**
 - Feature spans multiple milestones or will take more than one session
 - Multiple files/modules need coordinated changes
 - You need to track progress across context resets
 - Multiple agents will work on different pieces in parallel
 
-**Skip the plan when:**
-- Single-file change, small bugfix, quick refactor — use `best-practices` directly instead
+**Use PDD in lightweight mode (plan inline, no file) when:**
+- Feature is smaller but still touches multiple files
 - Work fits in one session with no risk of context loss
+- No milestones needed — it's a single logical chunk of work
+
+In lightweight mode, still write a plan — but present it inline in the conversation for user review instead of writing it to a markdown file. The inline plan should cover: what you're changing, which files are affected, the impact scan results, and the implementation approach. Get user approval before coding. All other PDD rules still apply: invoke `powerups:best-practices` (including the impact scan), run the skill audit, create a branch, ask clarifying questions, TDD, and run all post-completion steps (simplify, changelog, update-docs, full test suite, lint).
 
 **On every session start for feature work:**
 - Spawn an `Explore` subagent to check `plans/` for an existing plan. Plan files are large and consume significant context — **never read them directly in the main conversation**. The subagent should read the plan and return a concise summary: current milestone, next unchecked task, any blockers, and key design decisions.
@@ -228,7 +233,7 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Starting to code without checking `plans/` | Always check first — you may be mid-feature |
 | Vague tasks ("set up auth") | Be specific: file paths, endpoint names, model fields |
 | Forgetting to check off tasks | Update immediately — the plan is only useful if current |
-| Creating a plan for a 10-minute fix | Use `best-practices` directly for small changes |
+| Creating a plan for a 10-minute fix | Use PDD lightweight mode — no plan file, but still follow all PDD rules |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Running all tasks sequentially | Identify independent work and spawn subagents |
 | Skipping investigation/questions because "I know the codebase" | Always follow `best-practices` steps — investigate and ask first |
