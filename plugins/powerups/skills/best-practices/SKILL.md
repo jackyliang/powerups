@@ -39,6 +39,15 @@ git checkout -b feature/name
 **Subagent prompt template:**
 > "Investigate the codebase for [feature/problem]. Check: (1) does similar code already exist, (2) do existing services or third-party deps already handle this, (3) what patterns are used for similar features. Return a concise summary under 30 lines."
 
+**When working with 3rd party APIs or libraries:** Use `WebSearch` to look up the latest official documentation before writing any integration code. Your training data may be outdated — APIs change, deprecate endpoints, rename parameters, and introduce new best practices. A quick search confirms you're using the current API surface, not a stale version from memory.
+
+- Search for the official docs (e.g., "Stripe API create payment intent latest docs")
+- Check for recent breaking changes or migration guides
+- Verify parameter names, required fields, and response shapes against the current docs
+- If the library has a changelog or migration guide, skim it for recent changes
+
+**Do NOT rely on training knowledge alone for 3rd party API calls.** Even if you "know" the API, verify it — the cost of a search is trivial compared to debugging a broken integration from a deprecated endpoint.
+
 ### 3. Impact Scan Before Changing Existing Code
 
 **Before modifying any existing function, API, database schema, or shared utility, run 3 parallel subagents to exhaustively scan everything that depends on it.** This prevents incomplete changes that break existing code.
@@ -69,7 +78,7 @@ This is mandatory whenever you are:
 
 **This is NOT the same as practice #2 (Investigate Before Building).** Practice #2 asks "does similar code exist?" to avoid reinventing. This practice asks "what will break when I change this?" to avoid incomplete changes.
 
-### 4. Ask Before You Assume (was #3)
+### 4. Ask Before You Assume
 
 **Use `AskUserQuestion` to clarify before building.** Don't guess at requirements, scope, or approach.
 
@@ -185,7 +194,7 @@ Run the project's linter before committing:
 
 ```
 1.  Branch (never main)
-2.  Investigate (subagent — what exists?)
+2.  Investigate (subagent — what exists? WebSearch — latest 3rd party API docs)
 3.  Impact scan (3 parallel subagents — what will break?)
 4.  Ask (clarify requirements with user)
 5.  TDD (red → green → refactor)
@@ -211,6 +220,7 @@ Run the project's linter before committing:
 | Write tests after implementation | Write failing tests first (TDD) |
 | Copy-paste similar code | Extract shared utility |
 | Build custom infrastructure when a dependency handles it | Check third-party capabilities first |
+| Assume your training data has the latest 3rd party API | WebSearch the official docs before writing integration code |
 | Default to the easier approach | Present options, recommend the better one |
 | Keep old code "just in case" | Delete it — no backward compat by default |
 | Add backward compat shims without asking | Ask the user first — usually not needed |
