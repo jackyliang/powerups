@@ -206,7 +206,44 @@ This ensures the user validates each milestone incrementally rather than discove
 - Run the `update-docs` skill to sync all documentation — this is NOT optional
 - Run the project's linter
 - **Run the full test suite** — `pytest` (or the project's test command). ALL tests must pass before creating the PR. This catches regressions where new code breaks existing tests, or where tests and code were updated inconsistently (e.g., table name changes that affect both production code and test fixtures). Do not skip this step — a green test suite is a hard gate for PR creation.
-- Create PR
+- Create PR with manual verification steps (see below)
+
+### PR manual verification steps — MANDATORY
+
+Every PR must include a **Manual verification** section with step-by-step instructions the reviewer can follow to verify the feature works. Automated tests verify code correctness — manual steps verify feature correctness. These are different things.
+
+**Requirements:**
+- Each scenario is numbered with a descriptive title (e.g., "1. Widget: Talk to Human button")
+- Steps are sequential and specific — exact actions to take, not vague descriptions
+- Each step that checks behavior has a **Verify:** line stating what the reviewer should see
+- Include prerequisites if needed (env vars, server running, test data)
+- Cover the golden path, at least one edge case, and a no-regressions check
+
+**Example structure:**
+```markdown
+## Manual verification
+
+### 1. Creating a new widget
+1. Start local dev (`npm run dev`)
+2. Navigate to the dashboard → Widgets page
+3. Click "Create Widget"
+4. Fill in name: "Test Widget", select theme: "Dark"
+5. Click Save
+6. **Verify:** Widget appears in the list with name "Test Widget" and dark theme badge
+7. **Verify:** Toast shows "Widget created"
+
+### 2. Edge case: duplicate name
+1. Try creating another widget with name "Test Widget"
+2. **Verify:** Error message "A widget with this name already exists"
+3. **Verify:** No duplicate created in the list
+
+### 3. No regressions
+- [ ] Existing widgets still display correctly
+- [ ] Widget settings page still loads
+- [ ] Delete widget still works
+```
+
+**Do NOT** write vague test plans like "verify it works" or "check the UI". Every step should be reproducible by someone who has never seen the feature.
 
 ### Rolling back work
 If code is reverted or the developer isn't happy with the implementation:
@@ -246,3 +283,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Skipping the skill audit before writing the plan | **Always run the skill audit (step 4)** — list every powerups skill, decide YES/NO for each, and write YES skills into the plan as tasks |
 | Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
 | Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
+| PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
