@@ -199,9 +199,23 @@ When a milestone is complete (all tasks checked), **stop and let the user test m
 
 This ensures the user validates each milestone incrementally rather than discovering issues after everything is built.
 
-### After all milestones complete — POST-COMPLETION CHECKLIST
+### After all milestones complete — POST-COMPLETION AUDIT
 
-**CRITICAL: You MUST complete ALL of the following steps before creating the PR. Do NOT skip any step. Do NOT create the PR until every item is done. This checklist is a hard gate — treat each item as mandatory.**
+Just like the skill audit gates planning, the post-completion audit gates the PR. **You MUST output this audit to the user before creating the PR** — list each step, its status (done/not done), and evidence (e.g., "24 tests pass", "CHANGELOG.md updated with entry for..."). Do NOT create the PR until every item shows as done.
+
+**Post-completion audit output format:**
+```
+Post-completion audit:
+1. Skill audit review:     DONE — all 5 YES skills executed (best-practices, TDD, simple-design, update-docs, change-log)
+2. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
+3. change-log:             DONE — added entry "Your assistant can now..."
+4. update-docs:            DONE — CLAUDE.md and connector guide updated
+5. Linter:                 DONE — no new warnings
+6. Full test suite:        DONE — 133 passed, 0 failed
+7. PR ready:               YES — manual verification steps included
+```
+
+**The 7 steps:**
 
 1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
 2. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
@@ -289,4 +303,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
 | Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
 | PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
-| Skipping post-completion steps | **ALL 7 post-completion steps are mandatory.** Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, and the linter. Do not create the PR until all 7 are done. |
+| Skipping post-completion steps | **Output the post-completion audit to the user** before creating the PR. ALL 7 steps must show as DONE with evidence. Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, and the linter. |
