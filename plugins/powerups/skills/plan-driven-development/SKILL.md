@@ -199,14 +199,19 @@ When a milestone is complete (all tasks checked), **stop and let the user test m
 
 This ensures the user validates each milestone incrementally rather than discovering issues after everything is built.
 
-### After all milestones complete
-- **Execute every skill marked YES in the skill audit.** Go back to your skill audit output and confirm each one was actually used. If any was missed, execute it now before creating the PR.
-- **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix issues found.
-- **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` describing the feature in plain, business-user-friendly language. This is NOT optional for user-facing changes.
-- Run the `update-docs` skill to sync all documentation — this is NOT optional
-- Run the project's linter
-- **Run the full test suite** — `pytest` (or the project's test command). ALL tests must pass before creating the PR. This catches regressions where new code breaks existing tests, or where tests and code were updated inconsistently (e.g., table name changes that affect both production code and test fixtures). Do not skip this step — a green test suite is a hard gate for PR creation.
-- Create PR with manual verification steps (see below)
+### After all milestones complete — POST-COMPLETION CHECKLIST
+
+**CRITICAL: You MUST complete ALL of the following steps before creating the PR. Do NOT skip any step. Do NOT create the PR until every item is done. This checklist is a hard gate — treat each item as mandatory.**
+
+1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
+2. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
+3. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
+4. **Run `update-docs`** — sync all documentation (CLAUDE.md, guides, sibling repos). This is NOT optional.
+5. **Run the project's linter** — fix any lint errors introduced by your changes.
+6. **Run the FULL test suite** — `pytest` (or the project's test command). ALL tests must pass. This catches regressions where new code breaks existing tests. A green test suite is a hard gate.
+7. **Create PR** with manual verification steps (see below).
+
+**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. `/simplify` catches code quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
 
 ### PR manual verification steps — MANDATORY
 
@@ -284,3 +289,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
 | Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
 | PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
+| Skipping post-completion steps | **ALL 7 post-completion steps are mandatory.** Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, and the linter. Do not create the PR until all 7 are done. |
