@@ -220,6 +220,35 @@ Run `/update-docs` to check if the plan itself revealed stale documentation (e.g
 - Commit the plan file alongside code changes
 - If the approach fundamentally changes (e.g., switching auth strategy), create a new revision file (`-r2`) rather than editing in place — keep the original as history
 
+#### Plan drift — keep the plan in sync with reality
+
+The plan is the **single source of truth**. The moment your implementation diverges from what's written, the plan stops being trustworthy and any agent resuming from it will be confused or repeat a failed approach. Every time a decision changes mid-flight, update the plan in the same commit as the code.
+
+**This rule is for small/medium drift** — a decision that changed, an approach that didn't work, a tweak to data shape, a different library choice. For *fundamental* approach changes (auth strategy, architecture pivot, dropping a milestone), use the `-r{R}` revision file mechanism above instead.
+
+**Update additively — never rewrite history.** The original task wording and decisions stay visible so future readers can see what was tried and why it changed.
+
+**How to record drift in-place:**
+1. Leave the original task / decision text as-is. Do not delete or rewrite it.
+2. Directly under it, add a `> **Revised ({YYYY-MM-DD}):**` callout that states:
+   - What was originally planned
+   - What you actually did
+   - Why it changed (didn't work, edge case, better approach surfaced, user redirected)
+3. If new tasks are needed, add them as fresh checkboxes under the revised note. If old tasks no longer apply, leave them visible and annotate `~~superseded — see revised note~~` (or check them with a `(superseded)` suffix) — never delete.
+4. Update the Design / Architecture section if the change affects the documented design. Same pattern: add a "Revised" note rather than overwriting.
+5. **Commit the plan update with the code change** — one commit, both files. A code change without the matching plan update is incomplete work.
+
+**Example:**
+```markdown
+- [x] Use Redis for OTP storage with 5-minute TTL
+  > **Revised (2026-05-10):** Switched to Postgres with a `expires_at` column instead.
+  > Redis would have required a new dependency for one feature; the existing Postgres
+  > connection handles this with no infra change. TTL enforced via a cleanup job.
+- [x] Add `expires_at` column and cleanup job for OTP rows
+```
+
+**Why this matters:** Drift is silent. A task gets checked off because it's "done" in the developer's head, but the plan still describes the original approach. Six weeks later, someone reads the plan and is misled. Updating additively costs 30 seconds and keeps the plan honest.
+
 ### After each major milestone — pause for user testing
 When a milestone is complete (all tasks checked), **stop and let the user test manually** before moving on:
 
@@ -242,25 +271,33 @@ Just like the skill audit gates planning, the post-completion audit gates the PR
 ```
 Post-completion audit:
 1. Skill audit review:     DONE — all 5 YES skills executed (best-practices, TDD, simple-design, update-docs, change-log)
-2. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
-3. change-log:             DONE — added entry "Your assistant can now..."
-4. update-docs:            DONE — CLAUDE.md and connector guide updated
-5. Linter:                 DONE — no new warnings
-6. Full test suite:        DONE — 133 passed, 0 failed
-7. PR ready:               YES — manual verification steps included
+2. Plan vs reality audit:  DONE — folded 2 mid-flight decisions into plan (Redis→Postgres, added cleanup job task)
+3. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
+4. change-log:             DONE — added entry "Your assistant can now..."
+5. update-docs:            DONE — CLAUDE.md and connector guide updated
+6. Linter:                 DONE — no new warnings
+7. Full test suite:        DONE — 133 passed, 0 failed
+8. PR ready:               YES — manual verification steps included
 ```
 
-**The 7 steps:**
+**The 8 steps:**
 
 1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
-2. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
-3. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
-4. **Run `update-docs`** — sync all documentation (CLAUDE.md, guides, sibling repos). This is NOT optional.
-5. **Run the project's linter** — fix any lint errors introduced by your changes.
-6. **Run the FULL test suite** — `pytest` (or the project's test command). ALL tests must pass. This catches regressions where new code breaks existing tests. A green test suite is a hard gate.
-7. **Create PR** with manual verification steps (see below).
+2. **Plan vs reality audit** — read the plan against the actual implementation and confirm the plan is a faithful record of what shipped. Check:
+   - Every checked-off task was actually done as written. If a task was completed differently than described, add a `> **Revised:**` note (per the Plan drift section) so the plan reflects what really happened.
+   - Every mid-flight decision change was folded into the plan. If you remember thinking "we ended up doing X instead of Y" and the plan still says Y, update it now.
+   - Any unplanned work that got added during implementation is captured as a checked-off task with a one-line rationale — don't let work go unrecorded.
+   - The Design / Architecture section matches the shipped design. If it doesn't, append a revised note.
 
-**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. `/simplify` catches code quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
+   This is NOT optional. The plan is the historical record of what shipped — if it disagrees with the code, the plan is wrong and must be fixed before the PR. Drift caught here is cheap; drift caught six weeks from now by a confused agent is expensive.
+3. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
+4. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
+5. **Run `update-docs`** — sync all documentation (CLAUDE.md, guides, sibling repos). This is NOT optional.
+6. **Run the project's linter** — fix any lint errors introduced by your changes.
+7. **Run the FULL test suite** — `pytest` (or the project's test command). ALL tests must pass. This catches regressions where new code breaks existing tests. A green test suite is a hard gate.
+8. **Create PR** with manual verification steps (see below).
+
+**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. The plan-vs-reality audit catches plan rot. `/simplify` catches code quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
 
 ### PR manual verification steps — MANDATORY
 
@@ -338,5 +375,6 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
 | Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
 | PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
-| Skipping post-completion steps | **Output the post-completion audit to the user** before creating the PR. ALL 7 steps must show as DONE with evidence. Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, and the linter. |
+| Skipping post-completion steps | **Output the post-completion audit to the user** before creating the PR. ALL 8 steps must show as DONE with evidence. Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, the plan-vs-reality audit, and the linter. |
 | Skipping the scenario map on a complex refactor | For anything touching existing behavior, multiple actors, or overlapping states, enumerate every realistic user path grouped by actor. Single-perspective plans miss the edges that cause production incidents. Flag gaps and close every one before approval. |
+| Implementing differently than planned without updating the plan | The plan is the source of truth. The moment your approach changes mid-flight, update the plan additively (`> **Revised:**` note under the original task) — never rewrite history. Commit the plan update with the code change, not after. If you only catch the drift at the end, the plan-vs-reality audit (post-completion step 2) is your last chance to fix it before the PR. |
