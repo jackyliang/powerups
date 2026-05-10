@@ -76,7 +76,40 @@ What problem this solves, why it's being built, key relationships and constraint
 ### 2. Design / Architecture
 Data models, API endpoints, flow diagrams, key decisions and their rationale. Include enough detail that implementation doesn't require guessing.
 
-### 3. Milestones with Task Checkboxes
+### 3. Scenario Map (for complex changes only)
+
+**When to include this section:** Complex refactors, upgrades to existing systems, anything that changes behavior users already rely on, or features where multiple actors (end user, admin, operator) interact with overlapping states. Skip it in lightweight mode and for simple additive features.
+
+**Why this exists:** Plans written from a single happy-path perspective miss failure modes, edge cases, and state interactions — the things that actually cause production incidents. The scenario map forces you to enumerate every realistic user path before coding, so you spot gaps and ambiguities while they're cheap to resolve in the plan instead of discovering them mid-implementation or after ship.
+
+**How to build the map:**
+1. **List the actors** — who interacts with this system? (end user, admin, operator, background job, etc.)
+2. **List the state dimensions** — flags, connection states, permissions, origin types, API outcomes (200/4xx/5xx), cached vs fresh, etc.
+3. **For each actor × state combination, write a row:** what the user does, what the system does, and whether the current plan already covers it.
+4. **Explicitly flag gaps** — rows where the plan is silent or ambiguous. Each gap must become one of: a new task in a milestone, a decision surfaced to the user via `AskUserQuestion`, or an explicit "out of scope" note.
+5. **Include adversarial and degraded states** — disconnected mid-flow, stale tokens, network failure, duplicate submissions, two tabs racing, concurrent toggles, downgrade paths, rollback.
+
+**Table format (recommended):**
+
+```markdown
+### A — [Actor name, e.g., "Admin dashboard user"]
+
+| # | State | What happens | Plan coverage |
+|---|---|---|---|
+| A1 | Feature off, no connection | Existing behavior unchanged | OK |
+| A2 | Feature on, mid-flow disconnect | ??? | Gap — decide fallback |
+| A3 | Feature on, API 5xx on write | Fall back vs hard fail | Gap — ask user |
+```
+
+Group rows by actor (A, B, C…) so it stays scannable. Keep each row to one line — detail lives in the corresponding milestone task.
+
+**Turn gaps into actions before plan approval:**
+- For each Gap row, either (a) add a task that handles it, (b) mark it "out of scope" with a one-line rationale, or (c) use `AskUserQuestion` to collect a decision and then fold the answer back into the plan.
+- Do NOT leave gaps unresolved. An unresolved gap in the plan becomes a bug in production.
+
+Example from a real plan: for a ticket-routing upgrade, the scenario map surfaced (1) what happens when the external API fails mid-chat, (2) whether disconnecting the connector should auto-reset the routing toggle, (3) duplicate ticket creation when a form is double-submitted, and (4) whether the toggle-off direction needs the same confirmation as toggle-on. None of these were obvious from the happy-path design, and each one changed a milestone.
+
+### 4. Milestones with Task Checkboxes
 The core of the plan. Each milestone is a logical chunk of work with:
 
 ```markdown
@@ -106,7 +139,7 @@ Rules:
 - Check off tasks (`- [x]`) as they are completed
 - Never remove completed tasks — they're the history
 
-### 4. Progress Summary Table
+### 5. Progress Summary Table
 Quick at-a-glance status at the bottom of the file:
 
 ```markdown
@@ -163,10 +196,12 @@ Plans are designed for parallel work. When a feature has independent milestones 
 
    **Every skill marked YES must appear as an explicit task or note in the relevant milestone.** If `update-docs` applies, it MUST appear as a task in the final milestone or as a post-completion step. Do not rely on remembering — write it into the plan.
 6. Create `plans/v{N}-{description}.md`
-7. Write Context, Design, and Milestones sections — include skill-specific tasks identified in step 5
-8. Get user approval on the plan before coding
-9. Identify which milestones/tasks can be parallelized
-10. Begin work — spawn subagents for independent pieces
+7. Write Context and Design sections.
+8. **Scenario map (for complex refactors/upgrades):** Enumerate every realistic user path, grouped by actor, across all meaningful state combinations — including failures, disconnects, retries, stale state, and concurrent flips. Flag gaps. For every gap, either add a milestone task, mark it out of scope with a rationale, or ask the user via `AskUserQuestion` and fold the answer in. **Do not skip this for changes that modify existing behavior** — single-perspective plans miss the edges that break production. Skip it only for purely additive, lightweight, or internal-only features.
+9. Write the Milestones sections — include skill-specific tasks identified in step 5 and tasks that close every gap from step 8.
+10. Get user approval on the plan before coding
+11. Identify which milestones/tasks can be parallelized
+12. Begin work — spawn subagents for independent pieces
 
 ### After planning (before coding)
 Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
@@ -304,3 +339,4 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
 | PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
 | Skipping post-completion steps | **Output the post-completion audit to the user** before creating the PR. ALL 7 steps must show as DONE with evidence. Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, and the linter. |
+| Skipping the scenario map on a complex refactor | For anything touching existing behavior, multiple actors, or overlapping states, enumerate every realistic user path grouped by actor. Single-perspective plans miss the edges that cause production incidents. Flag gaps and close every one before approval. |
