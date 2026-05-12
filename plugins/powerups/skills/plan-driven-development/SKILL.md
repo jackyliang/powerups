@@ -271,7 +271,8 @@ Just like the skill audit gates planning, the post-completion audit gates the PR
 ```
 Post-completion audit:
 1. Skill audit review:     DONE — all 5 YES skills executed (best-practices, TDD, simple-design, update-docs, change-log)
-2. Plan vs reality audit:  DONE — folded 2 mid-flight decisions into plan (Redis→Postgres, added cleanup job task)
+2. Plan-drift audit:       DONE — additive: 7 unplanned widgets + 3 deps recorded in plan;
+                                  subtractive: 4 orphan files deleted, 2 completed Post-MVP items removed
 3. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
 4. change-log:             DONE — added entry "Your assistant can now..."
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
@@ -283,21 +284,24 @@ Post-completion audit:
 **The 8 steps:**
 
 1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
-2. **Plan vs reality audit** — read the plan against the actual implementation and confirm the plan is a faithful record of what shipped. Check:
-   - Every checked-off task was actually done as written. If a task was completed differently than described, add a `> **Revised:**` note (per the Plan drift section) so the plan reflects what really happened.
-   - Every mid-flight decision change was folded into the plan. If you remember thinking "we ended up doing X instead of Y" and the plan still says Y, update it now.
-   - Any unplanned work that got added during implementation is captured as a checked-off task with a one-line rationale — don't let work go unrecorded.
-   - The Design / Architecture section matches the shipped design. If it doesn't, append a revised note.
 
-   This is NOT optional. The plan is the historical record of what shipped — if it disagrees with the code, the plan is wrong and must be fixed before the PR. Drift caught here is cheap; drift caught six weeks from now by a confused agent is expensive.
+2. **Run `powerups:plan-drift-audit`** — actually invoke the skill. It reconciles the shipped artifact with the plan in BOTH directions:
+
+   - **Additive drift** — things that landed in the code but were never in the plan (new widgets a user asked for mid-build, dependencies you had to add, heuristics you layered on, bug fixes worth recording). Gets folded into a new `## What changed from the initial plan` section in the plan file.
+   - **Subtractive drift** — things that should be gone but aren't (orphan component files from a replaced feature, redirect stubs for paths nobody bookmarks anymore, completed "Post-MVP" items still listed as deferred, stale TODO comments, orphaned feature flags, unused imports, deprecated DB objects). Walked with the user and deleted in a `chore(plan-drift)` commit.
+
+   This is NOT optional. The plan is the historical record of what shipped — if it disagrees with the code, the plan is wrong and must be fixed before the PR. The subtractive sweep prevents stragglers from a replaced feature from rotting in the repo. Drift caught here is cheap; drift caught six weeks from now by a confused agent (or a curious dev wondering "is `GeoMapCard.tsx` still used?") is expensive.
+
+   Run this BEFORE `/simplify` so the cleanup is informed by both directions of drift — `/simplify` shouldn't refactor code that's about to be deleted as subtractive drift.
+
 3. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
 4. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
 5. **Run `update-docs`** — sync all documentation (CLAUDE.md, guides, sibling repos). This is NOT optional.
 6. **Run the project's linter** — fix any lint errors introduced by your changes.
 7. **Run the FULL test suite** — `pytest` (or the project's test command). ALL tests must pass. This catches regressions where new code breaks existing tests. A green test suite is a hard gate.
-8. **Create PR** with manual verification steps (see below).
+8. **Create PR** with manual verification steps (see below). Reference the drift section in the body so reviewers don't have to reverse-engineer scope creep.
 
-**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. The plan-vs-reality audit catches plan rot. `/simplify` catches code quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
+**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. The plan-drift audit catches both plan rot (additive) and repo straggle (subtractive). `/simplify` catches code-quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
 
 ### PR manual verification steps — MANDATORY
 
