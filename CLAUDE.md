@@ -25,6 +25,7 @@ powerups/
 │       ├── bug-fix/
 │       ├── change-log/
 │       ├── database-branching/
+│       ├── give-me-five/
 │       ├── plan-driven-development/
 │       ├── self-documenting-apis/
 │       ├── simple-design-principles/
