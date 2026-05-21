@@ -16,6 +16,8 @@ Reusable [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills fo
 | **self-documenting-apis** | Ensure FastAPI endpoints have docstrings, typed response/request models, and proper status codes so auto-generated docs are the single source of truth. |
 | **database-branching** | Fork your database like a git branch. Develop on the fork, merge migrations back, delete the fork. (Ghost DB / TimescaleDB only) |
 | **update-docs** | Sync all documentation after completing a feature. Finds stale content across CLAUDE.md, README, public skills/plugins, and downstream project docs. |
+| **drift-audit** | Run before the PDD post-completion audit. Reconciles shipped code vs the plan in both directions — additive drift (unplanned things that landed) and subtractive drift (orphan files, completed Post-MVP items, stale TODOs, dead redirect stubs). |
+| **qq** | Quick-question mode. Ultra-short answers and drafts. Drafted texts/messages and emails fit under 480 characters — no greetings, sign-offs, or preamble. |
 
 ## Install
 

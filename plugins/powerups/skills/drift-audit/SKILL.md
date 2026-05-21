@@ -1,9 +1,9 @@
 ---
-name: plan-drift-audit
+name: drift-audit
 description: Run before the post-completion audit (PDD M9) on any feature that used `powerups:plan-driven-development`. Reconciles the shipped artifact with the plan in BOTH directions — additive drift (what landed that wasn't planned) and subtractive drift (what's still in the code or plan but shouldn't be — dead files from replaced features, completed deferred items, stale TODOs, orphaned redirect stubs). Almost every shipped feature drifts on both axes; without this step the plan file lies and the repo accumulates stragglers.
 ---
 
-# Plan-Drift Audit
+# Drift Audit
 
 ## Overview
 
@@ -180,7 +180,7 @@ Without this audit:
 `powerups:plan-driven-development` invokes this skill as **step 0** of the post-completion audit, before any other audit step. The full audit sequence:
 
 ```
-0. Plan-drift audit (this skill)      ← additive + subtractive drift
+0. Drift audit (this skill)           ← additive + subtractive drift
 1. Skill audit review
 2. /simplify
 3. change-log
