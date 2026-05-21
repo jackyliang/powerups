@@ -25,8 +25,10 @@ powerups/
 │       ├── bug-fix/
 │       ├── change-log/
 │       ├── database-branching/
+│       ├── drift-audit/
 │       ├── give-me-five/
 │       ├── plan-driven-development/
+│       ├── qq/
 │       ├── self-documenting-apis/
 │       ├── simple-design-principles/
 │       ├── test-driven-development/
