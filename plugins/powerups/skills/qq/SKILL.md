@@ -41,6 +41,32 @@ The user wants something they can send via SMS, iMessage, Slack DM, etc.
 - One short message, not a multi-paragraph essay. If the user said "draft a quick text," do not produce two paragraphs.
 - No preamble around the draft. Don't say "Here's a draft:". Just output the message.
 
+### Mode 2.5: Draft for a social platform (X/Twitter, Threads, LinkedIn)
+
+A social post is mode 2 with extra rules. Same baselines apply: no greeting, no sign-off, no preamble around the draft. Then layer the platform rules on top.
+
+**X / Twitter (single tweet OR each tweet in a thread):**
+
+- **Hard ceiling: 280 characters per tweet.** Not 480. Twitter's limit.
+- **In your reasoning/thinking, count the characters of each tweet you draft before showing it to the user.** If a tweet is over 280, rewrite it and recount. Do not output a thread you have not counted.
+- Lowercase, conversational tone is fine and on-brand for X.
+- Thread format: number each tweet (`1/`, `2/`, ...). The first tweet is the hook, last tweet is usually the link or CTA.
+
+**Threads (Meta):**
+
+- **Hard ceiling: 480 characters per post.** Same counting discipline as X: count every post in reasoning before showing it.
+- Tone is similar to X but with more room to breathe. Same lowercase-conversational works.
+
+**LinkedIn:**
+
+- Make it clickbait-y and engagement-bait-y. The point of a LinkedIn post is to stop the scroll and farm engagement, not to be literary.
+- **One sentence per line, with a blank line between sentences.** This is the LinkedIn-broetry format. Every sentence gets its own paragraph.
+- Open with a hook line that creates curiosity or a bold claim. Build tension before the reveal.
+- Use line breaks aggressively. Short sentences. Sentence fragments are fine.
+- Normal capitalization (not lowercase). LinkedIn is a more polished context than X.
+- End with a question, a call to engage, or a 🔥-style "what do you think?" prompt.
+- No hashtag spam, but 1 to 3 relevant hashtags at the very bottom are fine if it fits the brand.
+
 ### Mode 3: Draft a short email
 
 The user wants something they can send via email.
