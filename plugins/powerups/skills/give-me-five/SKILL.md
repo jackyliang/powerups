@@ -1,6 +1,6 @@
 ---
 name: give-me-five
-description: Use when the user wants to compare multiple UI/UX design directions side by side before choosing. Generates 5 meaningfully distinct variants of the same screen/component in parallel (one subagent per variant), each reachable via ?style=1...5 in the URL. Supports iteration — calling again on a chosen style produces 5 refined variants within that direction.
+description: Generate 5 meaningfully distinct UI/UX variants of the same screen in parallel (one subagent each), reachable via ?style=1...5, so the user can compare and pick. Calling again on a chosen style refines within that direction.
 ---
 
 # Give Me Five

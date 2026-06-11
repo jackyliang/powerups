@@ -1,6 +1,6 @@
 ---
 name: qq
-description: Use for ultra-short replies. Three modes based on what the user is asking, answer a quick question, draft a short text/message, or draft a short email. Defaults to brevity over completeness. No preamble, no summaries, no offers to elaborate. Drafted messages and emails fit under 480 characters. Never use em-dashes.
+description: Ultra-short replies — answer a quick question, draft a short text/social post, or draft a short email. No preamble, no offers to elaborate, drafts under 480 characters (280 for X), never em-dashes.
 ---
 
 # qq (quick-question)

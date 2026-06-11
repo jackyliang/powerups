@@ -65,16 +65,13 @@ This is mandatory whenever you are:
 - Modifying a shared utility, helper, or base class
 - Changing an API endpoint's request/response shape
 
-**Run all 3 scans in parallel as `general-purpose` subagents:**
+**Run all 3 scans in parallel as `general-purpose` subagents**, each with this prompt shape:
 
-**Scan 1 — Callers:**
-> "I'm modifying [function/module]. Find EVERY import and call site across the entire codebase. Check: (1) every file that imports it, including aliased imports, (2) every direct and indirect call site with file path and line number, (3) any hardcoded values matching current defaults I'm changing, (4) related functions in the same module with similar patterns, (5) scheduled jobs, cron handlers, background tasks, or webhooks that trigger this code path. For each: file path, line number, exact usage, whether it needs updating."
+> "I'm modifying [function/module/table]. Find EVERY [scan target] across the entire codebase. For each: file path, line number, exact usage, whether it needs updating."
 
-**Scan 2 — Data:**
-> "I'm modifying [table/column/query]. Find EVERY database interaction across the entire codebase. Check: (1) every query that reads/writes the affected table(s), (2) every column reference in SELECTs, INSERTs, UPDATEs, WHERE clauses, JOINs, (3) every ORM model, typed dict, or Pydantic model mapping to this table, (4) every RPC/function call that touches this data, (5) every place that constructs rows or dicts matching the table schema. For each: file path, line number, exact usage, whether it needs updating."
-
-**Scan 3 — Tests:**
-> "I'm modifying [function/module]. Find EVERY test dependency across the entire codebase. Check: (1) every test file that imports or calls the changed function, (2) every fixture that sets up data for this code path, (3) every assertion that depends on current behavior (return values, side effects, batch sizes), (4) every mock or patch targeting the changed function, (5) integration tests exercising this code path end-to-end. For each: file path, test name, what it tests, whether it needs updating."
+- **Scan 1 — Callers:** every import (including aliased), every direct and indirect call site, hardcoded values matching defaults being changed, similar sibling functions in the same module, and scheduled jobs / cron / background tasks / webhooks that trigger this code path.
+- **Scan 2 — Data:** every query reading/writing the affected tables, every column reference (SELECT/INSERT/UPDATE/WHERE/JOIN), every ORM or Pydantic model mapping to the table, every RPC touching this data, every place constructing rows or dicts matching the schema.
+- **Scan 3 — Tests:** every test file importing or calling the changed code, fixtures setting up this code path, assertions depending on current behavior (return values, side effects, batch sizes), mocks/patches targeting it, and integration tests exercising it end-to-end.
 
 **What to do with the results:**
 - Merge findings from all 3 scans into a single impact picture

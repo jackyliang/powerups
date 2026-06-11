@@ -1,6 +1,6 @@
 ---
 name: drift-audit
-description: Run before the post-completion audit (PDD M9) on any feature that used `powerups:plan-driven-development`. Reconciles the shipped artifact with the plan in BOTH directions — additive drift (what landed that wasn't planned) and subtractive drift (what's still in the code or plan but shouldn't be — dead files from replaced features, completed deferred items, stale TODOs, orphaned redirect stubs). Almost every shipped feature drifts on both axes; without this step the plan file lies and the repo accumulates stragglers.
+description: Reconcile shipped code with the plan in both directions — additive drift (unplanned work that landed) and subtractive drift (dead files, stale TODOs, completed deferred items). Run as part of PDD's post-completion audit, before /simplify.
 ---
 
 # Drift Audit
@@ -151,46 +151,11 @@ In the PR body, link to the drift section: *"See `plans/v{N}.md#what-changed-fro
 
 ## Worked example
 
-A real v20 audit found:
-
-### Additive (~30 items)
-- **7 new endpoints / widgets** the plan didn't mention
-- **3 data model additions** (`country_code`, geo helper, backfill script)
-- **3 new dependencies** (react-simple-maps, d3-geo, world-atlas)
-- **3 heuristics** (quote ranking, admin-default-exclude, surfaced-query)
-- **6 frontend infra changes** (skeletons, KG-style table, sidebar rename, badge standardization, centralized styles, markdown rendering)
-- **3 backend infra changes** (LLM model bump, single feature gate, include-admin-dashboard)
-- **3 bug fixes** (PostgREST overload, react-simple-maps types, HeadersInit inference)
-- **3 ops milestones** (real backfill, geo backfill, dummy seed)
-
-### Subtractive (~5 items)
-- `KnowledgeGap.tsx`, `Analytics.tsx` — replaced by Insights, deleted (the `page.tsx` redirect stubs were kept intentionally; team chose to honor old bookmarks)
-- `GeoMapCard.tsx` — replaced by `WorldMapCard.tsx` mid-build, the abandoned file was still sitting in `components/`
-- `Post-MVP follow-ups → Backfill historical intent + sentiment` — completed; moved to "ops milestones" in the drift section above and removed from Post-MVP
-- A few unused lucide-react imports left over from a refactor pivot
-- An "Open decision" about chart library that had been resolved (recharts vs shadcn-charts → went bespoke SVG) but was still listed as open
-
-Without this audit:
-- The plan file would have looked like the original 9-milestone spec was what shipped.
-- Three orphan files would have stayed in the repo for the next dev to wonder about.
-- The Post-MVP section would have implied work is still pending when it isn't.
+A real v20 audit found ~30 additive items (7 unplanned endpoints/widgets, 3 data model additions, 3 new dependencies, heuristics, infra changes, bug fixes, ops milestones) and ~5 subtractive items (two components replaced by a new Insights page but never deleted, an orphaned `GeoMapCard.tsx` from a mid-build pivot, a completed Post-MVP item still listed as deferred, a resolved "Open decision" still listed as open). Without the audit, the plan would have looked like the original 9-milestone spec was what shipped, and three orphan files would have stayed in the repo for the next dev to wonder about.
 
 ## How this hooks into PDD
 
-`powerups:plan-driven-development` invokes this skill as **step 0** of the post-completion audit, before any other audit step. The full audit sequence:
-
-```
-0. Drift audit (this skill)           ← additive + subtractive drift
-1. Skill audit review
-2. /simplify
-3. change-log
-4. update-docs
-5. Linter
-6. Full test suite
-7. Create PR (referencing the drift section in the body)
-```
-
-**Why drift-audit goes first:** it informs everything downstream. `/simplify` shouldn't refactor code that's about to be deleted as subtractive drift. The CHANGELOG entry should reflect the *shipped* product, not the original plan. `update-docs` needs to know which sibling docs reference paths that just got cleaned up. The test suite shouldn't get fixture-updated for an old surface that's being removed.
+`powerups:plan-driven-development` invokes this skill during its post-completion audit — PDD owns the full sequence. The one ordering rule that matters here: **drift-audit runs before `/simplify`**, because drift informs everything downstream — `/simplify` shouldn't refactor code that's about to be deleted, the CHANGELOG should reflect the shipped product, and `update-docs` needs to know which docs reference paths that just got cleaned up.
 
 ## Common Mistakes
 

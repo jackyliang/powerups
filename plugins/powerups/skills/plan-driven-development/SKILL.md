@@ -9,9 +9,7 @@ description: Use when starting any feature (small or large), resuming work after
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
-**PDD requires `powerups:best-practices` — invoke it, don't just reference it.** Every practice in `powerups:best-practices` is mandatory here: TDD (tests before implementation), branching (never develop on main), investigation (subagent before building), clarifying questions (ask before assuming), DRY, frontend-design for UI, self-documenting APIs, update-docs when done. PDD adds planning infrastructure on top — it does NOT replace or relax any of those practices.
-
-**If you're unsure whether a best-practice applies:** it does. PDD is `powerups:best-practices` + plans, not plans instead of `powerups:best-practices`.
+**PDD requires `powerups:best-practices` — invoke it, don't just reference it.** Every practice there is mandatory here; PDD adds planning infrastructure on top, it does not replace or relax any of them. If you're unsure whether a best-practice applies: it does.
 
 ## When to Use
 
@@ -286,14 +284,7 @@ Post-completion audit:
 
 1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
 
-2. **Run `powerups:drift-audit`** — actually invoke the skill. It reconciles the shipped artifact with the plan in BOTH directions:
-
-   - **Additive drift** — things that landed in the code but were never in the plan (new widgets a user asked for mid-build, dependencies you had to add, heuristics you layered on, bug fixes worth recording). Gets folded into a new `## What changed from the initial plan` section in the plan file.
-   - **Subtractive drift** — things that should be gone but aren't (orphan component files from a replaced feature, redirect stubs for paths nobody bookmarks anymore, completed "Post-MVP" items still listed as deferred, stale TODO comments, orphaned feature flags, unused imports, deprecated DB objects). Walked with the user and deleted in a `chore(plan-drift)` commit.
-
-   This is NOT optional. The plan is the historical record of what shipped — if it disagrees with the code, the plan is wrong and must be fixed before the PR. The subtractive sweep prevents stragglers from a replaced feature from rotting in the repo. Drift caught here is cheap; drift caught six weeks from now by a confused agent (or a curious dev wondering "is `GeoMapCard.tsx` still used?") is expensive.
-
-   Run this BEFORE `/simplify` so the cleanup is informed by both directions of drift — `/simplify` shouldn't refactor code that's about to be deleted as subtractive drift.
+2. **Run `powerups:drift-audit`** — actually invoke the skill; it owns all the detail. It reconciles shipped code with the plan in both directions (additive and subtractive drift). NOT optional, and it runs BEFORE `/simplify` so the cleanup is informed by both directions — `/simplify` shouldn't refactor code that's about to be deleted as drift.
 
 3. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
 4. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
@@ -352,14 +343,6 @@ If code is reverted or the developer isn't happy with the implementation:
 - Progress summary shows all milestones as "Done"
 - Plan stays in `plans/` as historical record
 
-## UI Work
-
-When any milestone involves user-facing text or UI changes, use the `simple-design-principles` skill. Flag these tasks in the plan — copy should be reviewed with the same rigor as code.
-
-## API Work
-
-When any milestone involves creating or modifying API endpoints, use the `self-documenting-apis` skill. Every endpoint should have docstrings and typed response models so auto-generated docs (`/docs`, `/redoc`) are the single source of truth — no separate API reference file to maintain.
-
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -370,16 +353,6 @@ When any milestone involves creating or modifying API endpoints, use the `self-d
 | Creating a plan for a 10-minute fix | Use PDD lightweight mode — no plan file, but still follow all PDD rules |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Running all tasks sequentially | Identify independent work and spawn subagents |
-| Skipping investigation/questions because "I know the codebase" | Always follow `best-practices` steps — investigate and ask first |
-| Listing implementation tasks before test tasks in milestones | TDD is the default — test tasks come first. Only skip if the user explicitly opts out |
 | Writing a plan with no tests at all | Every milestone that adds behavior needs test tasks. If you forgot them, add them before starting implementation |
-| Treating PDD as a replacement for best-practices | PDD = `powerups:best-practices` + plans. Actually invoke the skill — don't just follow it from memory |
-| Jumping straight to coding after writing the plan | Follow best-practices: create branch, investigate codebase, ask clarifying questions FIRST |
-| Writing the plan file or implementing on `main` | **Always create a feature branch before writing anything** — plans and code both go on branches, never `main` |
-| Skipping the skill audit before writing the plan | **Always run the skill audit (step 4)** — list every powerups skill, decide YES/NO for each, and write YES skills into the plan as tasks |
-| Forgetting to run `update-docs` or other skills after completion | Go back to the skill audit and check off each YES skill. If you didn't run it, run it now |
-| Skipping the full test suite before creating the PR | **Always run all tests after the final milestone.** Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this. |
-| PR with no manual testing steps | **Every PR needs a Manual verification section** with numbered scenarios, specific actions, and **Verify:** lines. "Check the UI" is not a test step. |
-| Skipping post-completion steps | **Output the post-completion audit to the user** before creating the PR. ALL 8 steps must show as DONE with evidence. Running tests alone is not enough — you must also run `/simplify`, `change-log`, `update-docs`, the plan-vs-reality audit, and the linter. |
-| Skipping the scenario map on a complex refactor | For anything touching existing behavior, multiple actors, or overlapping states, enumerate every realistic user path grouped by actor. Single-perspective plans miss the edges that cause production incidents. Flag gaps and close every one before approval. |
-| Implementing differently than planned without updating the plan | The plan is the source of truth. The moment your approach changes mid-flight, update the plan additively (`> **Revised:**` note under the original task) — never rewrite history. Commit the plan update with the code change, not after. If you only catch the drift at the end, the plan-vs-reality audit (post-completion step 2) is your last chance to fix it before the PR. |
+| Skipping the full test suite before creating the PR | Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this |
+| Implementing differently than planned without updating the plan | Update the plan additively (`> **Revised:**` note under the original task) in the same commit as the code — never rewrite history. The drift audit (post-completion step 2) is the last chance to catch this before the PR |
