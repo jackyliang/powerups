@@ -1,6 +1,6 @@
 ---
 name: user-research
-description: Run product-manager-grade user research before building any user-facing feature — jobs-to-be-done analysis, user flow mapping, and a decision matrix. Use when someone asks to "build X" and X is a feature users will touch, before any design or code. Invoked by plan-driven-development (before the plan is written) and give-me-five (before generating variants). Output is a short discovery brief the requester approves, with open decisions surfaced as explicit questions, never silently assumed.
+description: Run PM-grade discovery before building any user-facing feature — problem statement, jobs-to-be-done, core flow, decision matrix. Output is a short brief with open decisions surfaced as explicit questions. Invoked by plan-driven-development and give-me-five.
 ---
 
 # User Research

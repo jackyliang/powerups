@@ -192,35 +192,7 @@ pytest tests/test_{module}.py -k "test_name" -v  # Specific test
 
 ## Integration with Plan-Driven Development
 
-When using the `plan-driven-development` skill for large features, TDD integrates directly into the plan's milestones.
-
-### How It Works
-
-Each milestone should have test tasks **before** implementation tasks:
-
-```markdown
-### Milestone 2: Auth Endpoints
-**Goal:** Email OTP login flow with JWT tokens.
-
-- [ ] Write failing tests for `POST /v1/auth/login` (sends OTP)
-- [ ] Write failing tests for `POST /v1/auth/verify` (validates OTP, returns JWT)
-- [ ] Write failing tests for `POST /v1/auth/refresh` (refreshes JWT)
-- [ ] Implement login endpoint to pass tests
-- [ ] Implement verify endpoint to pass tests
-- [ ] Implement refresh endpoint to pass tests
-
-**Verification:**
-- [ ] All tests pass against forked DB
-- [ ] Fork deleted after verification
-```
-
-### Task Order Within Milestones
-
-1. **Test tasks first** — `Write failing tests for X`
-2. **Run tests** — confirm they fail (red)
-3. **Implementation tasks** — `Implement X to pass tests`
-4. **Run tests** — confirm they pass (green)
-5. **Check off tasks** in the plan as completed
+When using the `plan-driven-development` skill, every milestone lists test tasks before implementation tasks — PDD's milestone template owns that structure; this skill governs how each test is written.
 
 ### Multi-Agent TDD
 
