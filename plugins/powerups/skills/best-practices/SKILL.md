@@ -13,6 +13,12 @@ The baseline discipline for every code change, no matter how small. A bug fix, a
 
 **Always.** Every code change should follow these practices. If the work is large enough for milestones and a plan file, use `plan-driven-development` instead (which includes everything here plus planning infrastructure).
 
+## Before the Practices: Are You Building the Right Thing?
+
+**If this is a new user-facing feature (not a bug fix, refactor, or internal change), run `powerups:user-research` FIRST** — before branching or writing code. It produces a short discovery brief (problem statement, jobs-to-be-done, core flow, decision matrix) so you build the right thing, not just build the thing right. Skip it for mechanical changes (rename, restyle, bugfix) or when the requester already specified exact behavior.
+
+(`plan-driven-development` and `give-me-five` already invoke `user-research` at the right moment — this pointer is for standalone feature work that doesn't go through either.)
+
 ## The Practices
 
 ### 1. Never Develop on Main
@@ -193,6 +199,7 @@ Run the project's linter before committing:
 ## Quick Reference
 
 ```
+0.  User-research (if new user-facing feature — run powerups:user-research first)
 1.  Branch (never main)
 2.  Investigate (subagent — what exists? WebSearch — latest 3rd party API docs)
 3.  Impact scan (3 parallel subagents — what will break?)
@@ -212,6 +219,7 @@ Run the project's linter before committing:
 
 | Don't | Do |
 |-------|-----|
+| Jump into building a new user-facing feature | Run `user-research` first — confirm you're building the right thing |
 | Commit to main | Create a branch first |
 | Start coding without checking what exists | Spawn Explore subagent first |
 | Change a function without scanning for all callers | Run 3 parallel impact scan subagents first |
