@@ -32,7 +32,8 @@ powerups/
 │       ├── self-documenting-apis/
 │       ├── simple-design-principles/
 │       ├── test-driven-development/
-│       └── update-docs/
+│       ├── update-docs/
+│       └── user-research/
 └── README.md
 ```
 

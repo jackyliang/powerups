@@ -33,6 +33,19 @@ Defer to `powerups:best-practices` — branch before any work. Five experimental
 git checkout -b feat/{description}-give-me-five
 ```
 
+### 0.5. Run `powerups:user-research` BEFORE brainstorming directions
+
+All five variants must solve the SAME user problem — they vary on aesthetics and
+layout, not on what job the screen does. Run `powerups:user-research` first to
+produce the discovery brief: problem statement, jobs-to-be-done, core flow, and
+the decision matrix. This research happens ONCE up front and anchors every
+variant; without it, five pretty screens can each quietly answer a different
+question. Get the requester's answers to the hand-off questions before dispatching.
+
+Skip only when discovery is already done (e.g. give-me-five was called straight
+out of a PDD plan that already ran user-research) or the screen is a pure restyle
+of an existing, well-understood flow.
+
 ### 1. Brainstorm 5 distinct directions BEFORE dispatching
 
 Generating 5 designs that are all the same vibe with different button colors is useless. Before launching any subagent, name the 5 directions on different axes. Good axes to vary on:
