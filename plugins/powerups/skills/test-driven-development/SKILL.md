@@ -127,7 +127,7 @@ Tests must hit real infrastructure:
 
 | What | How to Test |
 |------|-------------|
-| **Database operations** | Real Postgres (Ghost DB fork if available, otherwise cleanup-based) |
+| **Database operations** | Real Postgres with cleanup-based isolation |
 | **API endpoints** | Full HTTP via FastAPI test client against real DB |
 | **Service classes** | Instantiate real classes, call real methods |
 | **Provider APIs (Zendesk, etc.)** | Real API with test credentials, or VCR cassettes as last resort |
@@ -144,15 +144,11 @@ Tests must hit real infrastructure:
 
 ## Database Testing
 
-Always test against a real database — the same engine as production (Postgres, not SQLite).
+Always test against a real database — the same engine as production (Postgres, not SQLite). Never test against production — use a dedicated test database.
 
-### Ghost DB Projects → Use database-branching Skill
+### Cleanup-Based Isolation
 
-If the project uses Ghost DB, follow the **database-branching** skill for fork-based test isolation. Tests run against the development fork — no cleanup code needed, the fork is disposable. If forking fails, **stop and tell the user**. Do not silently fall back to testing against production.
-
-### Non-Ghost Projects → Cleanup-Based Isolation
-
-When Ghost DB is not available, you need explicit cleanup. Use one or both of these patterns:
+You need explicit cleanup so tests don't leave debris. Use one or both of these patterns:
 
 #### Transaction Rollback (Per-Test Isolation)
 
@@ -184,7 +180,7 @@ async def _cleanup_schema(test_engine, test_schema):
 - Use unique names per test (e.g., `test_{uuid.uuid4().hex[:12]}`) to avoid collisions
 - Always clean up in a `yield` fixture (runs even if test fails)
 - Clean up schemas, tables, and test data — don't leave debris
-- Consider a dedicated test database (not production) even without forking
+- Use a dedicated test database, never production
 
 ### Running Tests
 
@@ -230,7 +226,7 @@ Each milestone should have test tasks **before** implementation tasks:
 
 When spawning subagents for parallel milestone work, every agent prompt **must** include:
 
-> "Write failing integration tests FIRST in `tests/test_{module}.py`. Tests must use real database (Ghost DB fork) — no mocks. Run them to confirm they fail. Then write implementation to make them pass."
+> "Write failing integration tests FIRST in `tests/test_{module}.py`. Tests must use a real database — no mocks. Run them to confirm they fail. Then write implementation to make them pass."
 
 The team lead must verify:
 - Test files exist for every module
@@ -279,5 +275,5 @@ Before marking any task or feature complete:
 - [ ] Tests use real infrastructure (no mocks)
 - [ ] Tests verify behavior, not plumbing
 - [ ] Edge cases covered (empty, duplicate, invalid, unauthorized)
-- [ ] Test database cleaned up (Ghost DB fork deleted, or cleanup fixtures ran)
+- [ ] Test database cleaned up (cleanup fixtures ran)
 - [ ] Plan file updated (if using plan-driven-development)

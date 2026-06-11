@@ -190,7 +190,6 @@ Plans are designed for parallel work. When a feature has independent milestones 
    - test-driven-development: YES — new backend logic needs tests
    - simple-design-principles: YES — frontend UI with user-facing copy
    - self-documenting-apis: YES — new API endpoint
-   - database-branching: NO — not using Ghost DB
    - update-docs: YES — run after all milestones complete
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
