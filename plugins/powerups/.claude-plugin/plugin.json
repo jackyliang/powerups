@@ -1,11 +1,11 @@
 {
   "name": "powerups",
   "description": "Reusable Claude Code skills for disciplined software development.",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "author": {
     "name": "jackyliang"
   },
   "repository": "https://github.com/jackyliang/powerups",
   "license": "MIT",
-  "keywords": ["tdd", "testing", "planning", "database", "skills", "design", "ui", "copy", "api", "fastapi", "openapi"]
+  "keywords": ["tdd", "testing", "planning", "skills", "design", "ui", "copy", "api", "fastapi", "openapi"]
 }

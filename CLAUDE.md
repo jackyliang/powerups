@@ -24,7 +24,6 @@ powerups/
 │       ├── best-practices/
 │       ├── bug-fix/
 │       ├── change-log/
-│       ├── database-branching/
 │       ├── drift-audit/
 │       ├── give-me-five/
 │       ├── plan-driven-development/
