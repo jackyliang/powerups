@@ -186,6 +186,7 @@ Plans are designed for parallel work. When a feature has independent milestones 
    ```
    Skill audit for v10-sync-change-details:
    - best-practices: YES — always applies (already invoked)
+   - user-research: YES — user-facing feature; ran discovery brief before this plan
    - test-driven-development: YES — new backend logic needs tests
    - simple-design-principles: YES — frontend UI with user-facing copy
    - self-documenting-apis: YES — new API endpoint
@@ -195,13 +196,14 @@ Plans are designed for parallel work. When a feature has independent milestones 
    ```
 
    **Every skill marked YES must appear as an explicit task or note in the relevant milestone.** If `update-docs` applies, it MUST appear as a task in the final milestone or as a post-completion step. Do not rely on remembering — write it into the plan.
-6. Create `plans/v{N}-{description}.md`
-7. Write Context and Design sections.
-8. **Scenario map (for complex refactors/upgrades):** Enumerate every realistic user path, grouped by actor, across all meaningful state combinations — including failures, disconnects, retries, stale state, and concurrent flips. Flag gaps. For every gap, either add a milestone task, mark it out of scope with a rationale, or ask the user via `AskUserQuestion` and fold the answer in. **Do not skip this for changes that modify existing behavior** — single-perspective plans miss the edges that break production. Skip it only for purely additive, lightweight, or internal-only features.
-9. Write the Milestones sections — include skill-specific tasks identified in step 5 and tasks that close every gap from step 8.
-10. Get user approval on the plan before coding
-11. Identify which milestones/tasks can be parallelized
-12. Begin work — spawn subagents for independent pieces
+6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Produce the discovery brief: problem statement, jobs-to-be-done, core flow, and decision matrix. Get the requester's answers to the hand-off questions. Its output feeds the Context and Design sections below and turns silent assumptions into explicit decisions. Skip only for mechanical/internal changes (rename, restyle, bugfix) or when the requester already specified exact behavior.
+7. Create `plans/v{N}-{description}.md`
+8. Write Context and Design sections — grounded in the user-research brief when one was produced.
+9. **Scenario map (for complex refactors/upgrades):** Enumerate every realistic user path, grouped by actor, across all meaningful state combinations — including failures, disconnects, retries, stale state, and concurrent flips. Flag gaps. For every gap, either add a milestone task, mark it out of scope with a rationale, or ask the user via `AskUserQuestion` and fold the answer in. **Do not skip this for changes that modify existing behavior** — single-perspective plans miss the edges that break production. Skip it only for purely additive, lightweight, or internal-only features.
+10. Write the Milestones sections — include skill-specific tasks identified in step 5 and tasks that close every gap from step 9.
+11. Get user approval on the plan before coding
+12. Identify which milestones/tasks can be parallelized
+13. Begin work — spawn subagents for independent pieces
 
 ### After planning (before coding)
 Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
