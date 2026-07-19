@@ -154,7 +154,7 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
 
    **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
 6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
-7. **Grill the requester — capped at 5–10 questions.** Run a `/grilling` session on the feature idea: requirements, scope, edge cases, tradeoffs, what "done" means. **Hard cap: 5–10 questions total** — pick the highest-leverage ones, not grilling's default relentless depth; a planning session is not an interrogation. Stop early once the plan's open decisions are resolved. If the `grilling` skill isn't installed, ask the same capped set via `AskUserQuestion`.
+7. **Grill the requester — capped at 5–10 questions.** Invoke `powerups:grilling` on the feature idea: requirements, scope, edge cases, tradeoffs, what "done" means. **Hard cap: 5–10 questions total** — pick the highest-leverage ones, not grilling's default relentless depth; a planning session is not an interrogation. Stop early once the plan's open decisions are resolved.
 8. Create `plans/v{N}-{description}.md`
 9. Write Context and Design sections — grounded in the user-research brief when one was produced.
 10. **Scenario map** — build it per section 3 above for complex refactors/upgrades; resolve every gap before approval.

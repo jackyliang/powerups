@@ -14,6 +14,7 @@ Reusable [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills fo
 | **change-log** | Log each feature or fix in `CHANGELOG.md` using plain, business-user-friendly language. Powers the product updates blog. |
 | **simple-design-principles** | Rules for user-facing copy and UI components. Plain language, no jargon, consistent component usage. |
 | **give-me-five** | Generate 5 meaningfully distinct UI/UX variants of the same screen in parallel — one subagent per variant — each reachable via `?style=1...5`. Iterate on a chosen style to refine within that direction. |
+| **grilling** | Stress-test a plan, decision, or idea — one question at a time, each with suggested answers and a recommended pick, until shared understanding. Invoked by plan-driven-development with a 5–10 question cap. Adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT). |
 | **self-documenting-apis** | Ensure FastAPI endpoints have docstrings, typed response/request models, and proper status codes so auto-generated docs are the single source of truth. |
 | **update-docs** | Sync all documentation after completing a feature. Finds stale content across CLAUDE.md, README, public skills/plugins, and downstream project docs. |
 | **drift-audit** | Run before the PDD post-completion audit. Reconciles shipped code vs the plan in both directions — additive drift (unplanned things that landed) and subtractive drift (orphan files, completed Post-MVP items, stale TODOs, dead redirect stubs). |
