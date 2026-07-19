@@ -16,6 +16,7 @@ Reusable [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills fo
 | **give-me-five** | Generate 5 meaningfully distinct UI/UX variants of the same screen in parallel — one subagent per variant — each reachable via `?style=1...5`. Iterate on a chosen style to refine within that direction. |
 | **self-documenting-apis** | Ensure FastAPI endpoints have docstrings, typed response/request models, and proper status codes so auto-generated docs are the single source of truth. |
 | **update-docs** | Sync all documentation after completing a feature. Finds stale content across CLAUDE.md, README, public skills/plugins, and downstream project docs. |
+| **show-me** | Prove a change works after implementing it — derive a minimal test plan from the diff, run the app, drive it in the browser, and deliver a short MP4 recording (or terminal transcript for non-UI changes) as proof. Inspired by Devin's testing-and-recordings workflow. |
 | **drift-audit** | Run before the PDD post-completion audit. Reconciles shipped code vs the plan in both directions — additive drift (unplanned things that landed) and subtractive drift (orphan files, completed Post-MVP items, stale TODOs, dead redirect stubs). |
 | **qq** | Quick-question mode. Ultra-short answers and drafts. Drafted texts/messages and emails fit under 480 characters — no greetings, sign-offs, or preamble. |
 
