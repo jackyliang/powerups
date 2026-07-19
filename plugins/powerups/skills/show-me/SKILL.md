@@ -31,7 +31,7 @@ Get the app running before any recording starts.
 1. Read the diff to understand what needs demonstrating: `git diff main...HEAD` (or the PR diff via `gh pr diff`)
 2. Start the app locally the way the project normally does (check README, `package.json` scripts, `Makefile`, docker-compose). Run it in the background and confirm it's serving before proceeding
 3. If the flow needs credentials, seed data, or services that aren't available, ask the user for them **now** — never fake, stub, or screenshot around a login you can't complete
-4. For UI proof, load the Chrome tools if deferred — one ToolSearch call for the full set including `gif_creator` — then call `tabs_context_mcp` and create a **new** tab
+4. For UI proof, load the Chrome tools if deferred — one ToolSearch call for the full set including `gif_creator`, `javascript_tool`, and `resize_window` — then call `tabs_context_mcp` and create a **new** tab
 
 **Success criteria:** The app is running and you can reach the entry point of the changed behavior.
 
@@ -49,24 +49,35 @@ State the plan in one short list before executing. Don't ask for approval — ju
 
 ### Phase 3: Record
 
-**UI changes** — deliver as MP4. Two capture paths, in order of preference:
+**UI changes** — deliver as MP4.
 
-- **Preferred (macOS):** normalize the window size, then record that region natively with `screencapture` — real video, no GIF intermediate:
+Stage the scene before capturing (both paths):
+
+1. **Load the `frontend-design:frontend-design` skill** (if available) before styling the overlays below — the cursor and caption are designed UI and should read as intentional, not thrown-together defaults
+2. **Inject an animated cursor.** Automation clicks dispatch synthetic events — the real pointer never moves, so an unstaged recording shows the page reacting to nothing. Inject a small fixed-position cursor element with a CSS transition on `transform` (~300ms, ease-out) via `javascript_tool`; before every click, animate it to the target, let the transition finish, then click. Playback shows the pointer traveling, never teleporting
+3. **Inject a caption bar.** A fixed lower-third for one-line step annotations ("Submitting empty form — expect inline error"). Update the text as each step starts; clear it during the pause on the proof moment so the caption never covers the evidence
+
+Two capture paths, in order of preference:
+
+- **Preferred (macOS):** normalize the window size, then record **only the page viewport** natively with `screencapture` — real video, no GIF intermediate, no browser chrome:
   ```bash
   # Save the user's current bounds so you can restore them in Phase 4
   osascript -e 'tell application "Google Chrome" to get bounds of front window'
   # Resize to a standard viewport BEFORE recording — never record the window
   # at its current size. On a large or ultrawide display a full-width window
-  # makes an unwatchably wide recording. Setting bounds also makes the capture
-  # region deterministic: {100,100,1380,900} → record -R 100,100,1280,800
+  # makes an unwatchably wide recording
   osascript -e 'tell application "Google Chrome" to set bounds of front window to {100, 100, 1380, 900}'
-  screencapture -x -v -R 100,100,1280,800 flow.mov &   # records until stopped
+  ```
+  Then cut the tab strip, omnibox, and bookmarks bar out of the region — they're noise, not proof. With DevTools closed, measure the browser-chrome height from inside the page (`window.outerHeight - window.innerHeight` via `javascript_tool`) and record just the content:
+  ```bash
+  # x stays 100; y = 100 + chrome height; w,h = innerWidth,innerHeight
+  screencapture -x -v -R 100,<100+chromeH>,<innerW>,<innerH> flow.mov &
   # ...drive the flow in the browser...
-  pkill -INT screencapture                              # stop and finalize
+  pkill -INT screencapture                     # stop and finalize
   ffmpeg -i flow.mov -c copy -movflags +faststart flow.mp4
   ```
   (The `resize_window` browser tool also works for the resize step.) Requires screen-recording permission for the terminal, and the window must stay unobstructed at those coordinates for the whole recording. If permission is denied or you're not on macOS, use the fallback
-- **Fallback:** capture with `gif_creator`, then convert to MP4 — far smaller and scrubs properly:
+- **Fallback:** capture with `gif_creator` (it captures only the tab content, so no cropping needed), then convert to MP4 — far smaller and scrubs properly:
   ```bash
   ffmpeg -i flow.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" flow.mp4
   ```
@@ -108,6 +119,8 @@ Either way:
 | Don't | Do |
 |-------|-----|
 | Record the whole app "while you're at it" | Record only the flow the diff changed |
+| Record the tab strip and bookmarks bar along with the page | Crop the capture region to the page viewport |
+| Let clicks land with no visible pointer | Animate the injected cursor to each target before clicking |
 | Re-plan around a broken step mid-recording | Stop, fix the app, re-record from the top |
 | Ship a recording where the key moment flashes by | Pause on the proof moment so it reads in playback |
 | Mock the backend to make the UI demo work | Run the real stack; ask for missing credentials |
