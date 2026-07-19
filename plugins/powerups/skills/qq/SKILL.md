@@ -31,6 +31,15 @@ The user just wants the answer.
 - Code answers: the snippet, maybe one line of context. No "Let me explain...", no full walkthrough.
 - Skip caveats unless they change the answer.
 
+Shape the answer so it can be acted on immediately (adapted from [i-have-adhd](https://github.com/ayghri/i-have-adhd)):
+
+- If the answer is an action, lead with it. The command, path, or snippet goes first; prose after, if at all.
+- Multi-step answers get a numbered list. One bounded action per step, capped at 5 items. If it grows past 5, split into "do now" vs "later".
+- If anything is left open, end with ONE concrete next action ("Next: run `npm test` and paste the first failing line"). A next action is not an offer to elaborate; those stay banned.
+- Spotted a second issue? Answer the question first, then one line: "Separately: X. Want me to handle it?" No mid-answer tangents.
+- Estimates in concrete units ("15 minutes", "an afternoon"), never "some work" or "a bit".
+- Errors: state cause and fix, matter-of-factly. No "Uh oh", no "there seems to be a problem".
+
 ### Mode 2: Draft a text or short message
 
 The user wants something they can send via SMS, iMessage, Slack DM, etc.
