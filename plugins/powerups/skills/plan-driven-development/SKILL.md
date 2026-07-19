@@ -131,7 +131,7 @@ Then implement to make tests pass:
 Milestones that are pure refactors of already-tested code (e.g., moving code without changing behavior) don't need new tests — but existing tests must still pass.
 
 Rules:
-- Tasks are concrete and actionable ("Create `sync_hq/auth/models.py`" not "Set up auth")
+- Tasks are concrete and actionable ("Create `src/auth/models.py`" not "Set up auth")
 - Include file paths where relevant
 - **Test tasks come before implementation tasks within each milestone** — this is the TDD ordering
 - Check off tasks (`- [x]`) as they are completed

@@ -70,7 +70,7 @@ Output this list to the user before dispatching. (No approval needed unless they
 
 ### 2. Dispatch 5 parallel subagents — one per variant
 
-Each variant is built by its own `general-purpose` subagent. **All 5 launched in a single message with 5 Task tool calls in parallel** — sequential dispatch is 5× slower for no gain. The main agent's job is brainstorming, dispatch, and assembly; the subagents do the design work.
+Each variant is built by its own `general-purpose` subagent. **All 5 launched in a single message with 5 Agent tool calls in parallel** — sequential dispatch is 5× slower for no gain. The main agent's job is brainstorming, dispatch, and assembly; the subagents do the design work.
 
 **The main agent does NOT design.** It writes `index.tsx` (the router) and orchestrates. Letting a subagent own the router risks two agents editing the same file.
 
@@ -167,7 +167,7 @@ Iteration is convergent — each cycle narrows the design space. The first call 
 | Mistake | Fix |
 |---------|-----|
 | Generating 5 variants that are basically the same design with different colors | Vary on 3–4 design axes, not 1. Name the directions before dispatching. |
-| Dispatching subagents sequentially instead of in parallel | All 5 Task tool calls go in a single message. Sequential is 5× slower and there's no dependency between variants. |
+| Dispatching subagents sequentially instead of in parallel | All 5 Agent tool calls go in a single message. Sequential is 5× slower and there's no dependency between variants. |
 | Subagent prompt that says "see above" or "same approach as before" | Each subagent is fresh — paste the direction, file path, props, content, quality bar, and constraints into every prompt. No references to context they can't see. |
 | Letting a subagent write the router | The router (`index.tsx`) is the main agent's job. Subagents only produce their assigned variant file. Two agents editing the router = merge conflicts. |
 | Main agent doing design work | Main agent brainstorms directions and orchestrates; subagents design. If the main agent is writing CSS, something is wrong. |
