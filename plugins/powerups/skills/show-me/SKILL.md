@@ -49,15 +49,28 @@ State the plan in one short list before executing. Don't ask for approval — ju
 
 ### Phase 3: Record
 
-**UI changes** — record with `gif_creator`, deliver as MP4:
+**UI changes** — deliver as MP4. Two capture paths, in order of preference:
 
-- Start capture **before** navigating to the flow; capture extra frames before and after each action so playback is smooth
-- Execute the plan exactly. Pause briefly on the "proof moment" (the fixed output, the new element) so it's legible in playback
-- Convert the captured GIF to MP4 before delivering — MP4 is far smaller and scrubs properly:
+- **Preferred (macOS):** record the browser window region natively with `screencapture` — real video, no GIF intermediate:
+  ```bash
+  # Chrome window bounds (returns x1, y1, x2, y2 — convert to x,y,width,height)
+  osascript -e 'tell application "Google Chrome" to get bounds of front window'
+  screencapture -x -v -R <x,y,w,h> flow.mov &   # records until stopped
+  # ...drive the flow in the browser...
+  pkill -INT screencapture                       # stop and finalize
+  ffmpeg -i flow.mov -c copy -movflags +faststart flow.mp4
+  ```
+  Requires screen-recording permission for the terminal, and the window must stay unobstructed at those coordinates for the whole recording. If permission is denied or you're not on macOS, use the fallback
+- **Fallback:** capture with `gif_creator`, then convert to MP4 — far smaller and scrubs properly:
   ```bash
   ffmpeg -i flow.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" flow.mp4
   ```
   If `ffmpeg` isn't installed, deliver the GIF and say so — don't block the proof on a codec
+
+Either way:
+
+- Start capture **before** navigating to the flow so playback has context on both sides of each action
+- Execute the plan exactly. Pause briefly on the "proof moment" (the fixed output, the new element) so it's legible in playback
 - Name the file after the behavior, not the task: `login_error_message.mp4`, not `test.mp4`
 - If a step fails, **stop recording and fix the app, not the plan**. Re-record from the top once fixed — a recording that skips the broken part is not proof
 
