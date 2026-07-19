@@ -26,7 +26,7 @@ PDD can be invoked for features of any size. The difference is whether you write
 - Work fits in one session with no risk of context loss
 - No milestones needed — it's a single logical chunk of work
 
-In lightweight mode, still write a plan — present it inline for user review instead of writing a file: what you're changing, which files are affected, impact scan results, and the approach. Get approval before coding. All other PDD rules still apply: invoke `powerups:best-practices`, run the skill audit, branch, ask clarifying questions, TDD, and run the post-completion audit.
+In lightweight mode, still write a plan — present it inline for user review instead of writing a file: what you're changing, which files are affected, impact scan results, and the approach. Get approval before coding. All other PDD rules still apply: invoke `powerups:best-practices`, run the skill audit, branch, run the capped grilling session (workflow step 7), TDD, and run the post-completion audit.
 
 **On every session start for feature work:**
 - Spawn an `Explore` subagent to check `plans/` for an existing plan. Plan files are large — **never read them directly in the main conversation**. The subagent returns a concise summary: current milestone, next unchecked task, blockers, key design decisions.
@@ -138,7 +138,7 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
 1. **Set `/effort max`** — planning requires deep reasoning.
 2. Check `plans/` — find the next version number.
 3. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. Never write plans or code on `main` — even the plan commit goes on a branch.
-4. **Invoke `powerups:best-practices`** — actually invoke it, so branching, investigation, impact scan, and clarifying questions happen before any code or plan is written.
+4. **Invoke `powerups:best-practices`** — actually invoke it, so branching, investigation, and the impact scan happen before any code or plan is written.
 5. **Skill audit — required before writing the plan.** List every available powerups skill by name; for each, state whether it applies to this feature and why. Output the analysis to the user.
 
    ```
@@ -154,13 +154,14 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
 
    **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
 6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
-7. Create `plans/v{N}-{description}.md`
-8. Write Context and Design sections — grounded in the user-research brief when one was produced.
-9. **Scenario map** — build it per section 3 above for complex refactors/upgrades; resolve every gap before approval.
-10. Write the Milestones — include the skill tasks from step 5 and the gap-closing tasks from step 9.
-11. Get user approval on the plan before coding.
-12. Identify which milestones/tasks can be parallelized.
-13. Begin work — spawn subagents for independent pieces.
+7. **Grill the requester — capped at 5–10 questions.** Run a `/grilling` session on the feature idea: requirements, scope, edge cases, tradeoffs, what "done" means. **Hard cap: 5–10 questions total** — pick the highest-leverage ones, not grilling's default relentless depth; a planning session is not an interrogation. Stop early once the plan's open decisions are resolved. If the `grilling` skill isn't installed, ask the same capped set via `AskUserQuestion`.
+8. Create `plans/v{N}-{description}.md`
+9. Write Context and Design sections — grounded in the user-research brief when one was produced.
+10. **Scenario map** — build it per section 3 above for complex refactors/upgrades; resolve every gap before approval.
+11. Write the Milestones — include the skill tasks from step 5 and the gap-closing tasks from step 10.
+12. Get user approval on the plan before coding.
+13. Identify which milestones/tasks can be parallelized.
+14. Begin work — spawn subagents for independent pieces.
 
 ### After planning (before coding)
 Run `/update-docs` to check if the planning investigation revealed stale documentation (outdated CLAUDE.md entries, incorrect API references in sibling repos). Fix staleness before implementing.
