@@ -51,16 +51,21 @@ State the plan in one short list before executing. Don't ask for approval — ju
 
 **UI changes** — deliver as MP4. Two capture paths, in order of preference:
 
-- **Preferred (macOS):** record the browser window region natively with `screencapture` — real video, no GIF intermediate:
+- **Preferred (macOS):** normalize the window size, then record that region natively with `screencapture` — real video, no GIF intermediate:
   ```bash
-  # Chrome window bounds (returns x1, y1, x2, y2 — convert to x,y,width,height)
+  # Save the user's current bounds so you can restore them in Phase 4
   osascript -e 'tell application "Google Chrome" to get bounds of front window'
-  screencapture -x -v -R <x,y,w,h> flow.mov &   # records until stopped
+  # Resize to a standard viewport BEFORE recording — never record the window
+  # at its current size. On a large or ultrawide display a full-width window
+  # makes an unwatchably wide recording. Setting bounds also makes the capture
+  # region deterministic: {100,100,1380,900} → record -R 100,100,1280,800
+  osascript -e 'tell application "Google Chrome" to set bounds of front window to {100, 100, 1380, 900}'
+  screencapture -x -v -R 100,100,1280,800 flow.mov &   # records until stopped
   # ...drive the flow in the browser...
-  pkill -INT screencapture                       # stop and finalize
+  pkill -INT screencapture                              # stop and finalize
   ffmpeg -i flow.mov -c copy -movflags +faststart flow.mp4
   ```
-  Requires screen-recording permission for the terminal, and the window must stay unobstructed at those coordinates for the whole recording. If permission is denied or you're not on macOS, use the fallback
+  (The `resize_window` browser tool also works for the resize step.) Requires screen-recording permission for the terminal, and the window must stay unobstructed at those coordinates for the whole recording. If permission is denied or you're not on macOS, use the fallback
 - **Fallback:** capture with `gif_creator`, then convert to MP4 — far smaller and scrubs properly:
   ```bash
   ffmpeg -i flow.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" flow.mp4
@@ -86,7 +91,7 @@ Either way:
 1. Send the recording (or transcript) to the user with `SendUserFile`, captioned with a one-line pass/fail summary
 2. Report the plan-vs-result: each step, what was expected, what the recording shows
 3. If a PR exists, post the test plan and result as a PR comment (`gh pr comment`) so the reviewer has the summary next to the code
-4. Stop the app and close the tab you created
+4. Stop the app, close the tab you created, and restore the browser window to the bounds you saved before resizing
 
 **Success criteria:** The user has the file, and the summary honestly reflects what was and wasn't demonstrated.
 
