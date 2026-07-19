@@ -16,7 +16,7 @@ Run this audit between marking the last milestone done and step 1 of the post-co
 
 ## When to Use
 
-- **Always**, as part of the post-completion audit for any feature that used `powerups:plan-driven-development`. Run before `/simplify` so the cleanup is informed by both directions of drift.
+- **Always**, as part of the post-completion audit for any feature that used `powerups:plan-driven-development`. PDD owns the full sequence; the one ordering rule that matters: **drift-audit runs before `/simplify`** — `/simplify` shouldn't refactor code that's about to be deleted, the CHANGELOG should reflect the shipped product, and `update-docs` needs to know which paths just got cleaned up.
 - For PDD **lightweight mode** (no plan file): run a slimmed-down version — skip the plan-file edit, but still do the subtractive sweep on the code.
 - For pure refactors with no plan: skip the additive pass, do the subtractive sweep.
 
@@ -153,20 +153,13 @@ In the PR body, link to the drift section: *"See `plans/v{N}.md#what-changed-fro
 
 A real v20 audit found ~30 additive items (7 unplanned endpoints/widgets, 3 data model additions, 3 new dependencies, heuristics, infra changes, bug fixes, ops milestones) and ~5 subtractive items (two components replaced by a new Insights page but never deleted, an orphaned `GeoMapCard.tsx` from a mid-build pivot, a completed Post-MVP item still listed as deferred, a resolved "Open decision" still listed as open). Without the audit, the plan would have looked like the original 9-milestone spec was what shipped, and three orphan files would have stayed in the repo for the next dev to wonder about.
 
-## How this hooks into PDD
-
-`powerups:plan-driven-development` invokes this skill during its post-completion audit — PDD owns the full sequence. The one ordering rule that matters here: **drift-audit runs before `/simplify`**, because drift informs everything downstream — `/simplify` shouldn't refactor code that's about to be deleted, the CHANGELOG should reflect the shipped product, and `update-docs` needs to know which docs reference paths that just got cleaned up.
-
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| Skipping drift because "the plan was followed closely" | Run it anyway — almost every shipped feature has invisible drift on both axes. The 5-minute audit beats reading every commit six months later. |
-| Pasting a giant raw `git log` into the plan | The drift section should be a curated narrative grouped by category, not a commit dump. The subagent's job is to summarize, not list. |
+| Skipping drift because "the plan was followed closely" | Run it anyway — almost every shipped feature has invisible drift on both axes. |
 | Listing items already in the plan | The audit is for what's *additive*. A milestone task that grew slightly mid-build isn't drift — only net-new things or substituted approaches count. |
-| Deleting low-confidence orphan code without confirming | Subtractive drift gets confirmed before deletion. Some "dead-looking" code is actually referenced by tests, cron, or deploy scripts. |
-| Treating drift as a "lessons learned" diary | Drift documents what changed in the *built artifact*. It's not a retrospective on what went well or badly. Save process feedback for elsewhere. |
-| Burying the additive section at the bottom of the plan | Put it right after Context so anyone reading the plan top-down learns the diff before reading the (possibly stale) Design section. |
-| Writing prose paragraphs instead of tables/bullets | Drift sections get scanned, not read. Use tables for the dense categories (endpoints, data model, deps), bullets for the rest. |
-| Skipping the subtractive sweep because "/simplify handles it" | `/simplify` catches code-quality issues; it doesn't reliably find every orphaned-file-after-a-replacement or every completed-but-still-listed Post-MVP entry. The subagent prompt above is targeted at exactly those cases. |
-| Running drift after the PR is open | Then the PR description can't reference it, and subtractive deletions land in follow-up commits that look unmotivated. Run drift first, then audit, then PR. |
+| Deleting low-confidence orphan code without confirming | Some "dead-looking" code is actually referenced by tests, cron, or deploy scripts. Confirm before deleting. |
+| Treating drift as a "lessons learned" diary | Drift documents what changed in the *built artifact*, not a retrospective on process. |
+| Skipping the subtractive sweep because "/simplify handles it" | `/simplify` catches code-quality issues; it doesn't reliably find orphaned files after a replacement or completed-but-still-listed Post-MVP entries. |
+| Running drift after the PR is open | Then the PR can't reference it, and deletions land in follow-up commits that look unmotivated. Drift first, then audit, then PR. |

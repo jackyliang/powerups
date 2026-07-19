@@ -35,16 +35,9 @@ git checkout -b feat/{description}-give-me-five
 
 ### 0.5. Run `powerups:user-research` BEFORE brainstorming directions
 
-All five variants must solve the SAME user problem — they vary on aesthetics and
-layout, not on what job the screen does. Run `powerups:user-research` first to
-produce the discovery brief: problem statement, jobs-to-be-done, core flow, and
-the decision matrix. This research happens ONCE up front and anchors every
-variant; without it, five pretty screens can each quietly answer a different
-question. Get the requester's answers to the hand-off questions before dispatching.
+All five variants must solve the SAME user problem — they vary on aesthetics and layout, not on what job the screen does. Run `powerups:user-research` once up front so the discovery brief anchors every variant; without it, five pretty screens can each quietly answer a different question. Get the requester's answers to the hand-off questions before dispatching.
 
-Skip only when discovery is already done (e.g. give-me-five was called straight
-out of a PDD plan that already ran user-research) or the screen is a pure restyle
-of an existing, well-understood flow.
+Skip only when discovery is already done (e.g. give-me-five was called out of a PDD plan that already ran user-research) or the screen is a pure restyle of an existing, well-understood flow.
 
 ### 1. Brainstorm 5 distinct directions BEFORE dispatching
 
@@ -166,15 +159,8 @@ Iteration is convergent — each cycle narrows the design space. The first call 
 
 | Mistake | Fix |
 |---------|-----|
-| Generating 5 variants that are basically the same design with different colors | Vary on 3–4 design axes, not 1. Name the directions before dispatching. |
-| Dispatching subagents sequentially instead of in parallel | All 5 Agent tool calls go in a single message. Sequential is 5× slower and there's no dependency between variants. |
-| Subagent prompt that says "see above" or "same approach as before" | Each subagent is fresh — paste the direction, file path, props, content, quality bar, and constraints into every prompt. No references to context they can't see. |
-| Letting a subagent write the router | The router (`index.tsx`) is the main agent's job. Subagents only produce their assigned variant file. Two agents editing the router = merge conflicts. |
-| Main agent doing design work | Main agent brainstorms directions and orchestrates; subagents design. If the main agent is writing CSS, something is wrong. |
-| Skipping `frontend-design` in subagent prompts | Every subagent invokes it — variants need to be polished, not just varied. |
-| Half-implementing some variants (e.g., only the hero) | Every variant is a full, polished design. Otherwise the comparison is unfair. |
+| 5 variants that are the same design with different colors | Vary on 3–4 design axes, not 1. Name the directions before dispatching. |
+| Subagent prompt that says "see above" or "same approach as before" | Each subagent is fresh — paste the direction, file path, props, content, and constraints into every prompt. |
+| Letting a subagent write the router | The router is the main agent's job; two agents editing it = merge conflicts. If the main agent is writing CSS, something else is wrong. |
 | Trusting subagent summaries without verifying files exist | After all 5 return, check each file on disk. Summaries describe intent, not reality. |
-| Not telling the user how to switch between them | Always hand off the numbered URLs with the variant names, and make sure the dev server is running. |
-| Iterating without anchoring to the chosen style | In iteration mode, the aesthetic/typography/palette are FIXED. Paste the anchor into every subagent prompt this round. |
-| Keeping previous variants around after iteration | Replace 1–5 each cycle. Past variants are noise unless the user explicitly asks to keep one. |
-| Skipping the feature branch | Defer to `powerups:best-practices`. Five experimental variants on main is asking for a mess. |
+| Iterating without anchoring to the chosen style | In iteration mode the aesthetic/typography/palette are FIXED — paste the anchor into every prompt that round, and replace Style1–5 rather than accumulating. |

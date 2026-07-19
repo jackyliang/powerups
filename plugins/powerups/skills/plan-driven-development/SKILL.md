@@ -9,7 +9,7 @@ description: Use when starting any feature (small or large), resuming work after
 
 Large features get a versioned plan file in `plans/` that serves as the **single source of truth** — what's been done, what's in progress, and what's left. The plan persists across context windows so any agent (or agent team) can pick up where the last one left off.
 
-**PDD requires `powerups:best-practices` — invoke it, don't just reference it.** Every practice there is mandatory here; PDD adds planning infrastructure on top, it does not replace or relax any of them. If you're unsure whether a best-practice applies: it does.
+**PDD requires `powerups:best-practices` — invoke it, don't just reference it.** Every practice there is mandatory here; PDD adds planning infrastructure on top. If you're unsure whether a best-practice applies: it does.
 
 ## When to Use
 
@@ -21,17 +21,17 @@ PDD can be invoked for features of any size. The difference is whether you write
 - You need to track progress across context resets
 - Multiple agents will work on different pieces in parallel
 
-**Use PDD in lightweight mode (plan inline, no file) when:**
+**Use lightweight mode (plan inline, no file) when:**
 - Feature is smaller but still touches multiple files
 - Work fits in one session with no risk of context loss
 - No milestones needed — it's a single logical chunk of work
 
-In lightweight mode, still write a plan — but present it inline in the conversation for user review instead of writing it to a markdown file. The inline plan should cover: what you're changing, which files are affected, the impact scan results, and the implementation approach. Get user approval before coding. All other PDD rules still apply: invoke `powerups:best-practices` (including the impact scan), run the skill audit, create a branch, ask clarifying questions, TDD, and run all post-completion steps (simplify, changelog, update-docs, full test suite, lint).
+In lightweight mode, still write a plan — present it inline for user review instead of writing a file: what you're changing, which files are affected, impact scan results, and the approach. Get approval before coding. All other PDD rules still apply: invoke `powerups:best-practices`, run the skill audit, branch, ask clarifying questions, TDD, and run the post-completion audit.
 
 **On every session start for feature work:**
-- Spawn an `Explore` subagent to check `plans/` for an existing plan. Plan files are large and consume significant context — **never read them directly in the main conversation**. The subagent should read the plan and return a concise summary: current milestone, next unchecked task, any blockers, and key design decisions.
-- If the subagent finds an active plan, use its summary to orient yourself. Only read specific sections of the plan directly if you need exact task wording or file paths.
-- Update the progress summary table and check off completed tasks (these edits are small and fine in the main context).
+- Spawn an `Explore` subagent to check `plans/` for an existing plan. Plan files are large — **never read them directly in the main conversation**. The subagent returns a concise summary: current milestone, next unchecked task, blockers, key design decisions.
+- If there's an active plan, orient from the summary. Only read specific plan sections directly if you need exact task wording or file paths.
+- Update the progress summary table and check off completed tasks (small edits, fine in main context).
 
 ## Plan Location & Naming
 
@@ -45,49 +45,37 @@ plans/
 ```
 
 **Naming:** `v{N}-{short-action-description}.md` (initial), `v{N}-{description}-r{R}.md` (revisions)
-- `v{N}` — Sequential version number (check existing files for the next number)
-- `{short-action-description}` — Lowercase, hyphens, action-oriented (e.g., `auth-and-production-readiness`, `multi-provider-support`)
-- `-r{R}` — Revision suffix, appended when the plan undergoes a major change (r2, r3, etc.). The initial version has no suffix (implicitly r1).
+- `v{N}` — sequential version number (check existing files for the next number)
+- `{short-action-description}` — lowercase, hyphens, action-oriented (e.g., `multi-provider-support`)
+- `-r{R}` — revision suffix for major changes (r2, r3, …). The initial version has no suffix.
 - If `plans/` doesn't exist, create it
 
 **Title inside the file** should match: `# v1-r2: Auth & Production Readiness (WorkOS)`
 
-**When to create a revision (new file with `-r{R}` suffix):**
-- Core technical approach changes (e.g., DIY JWT → WorkOS)
-- Major scope added or removed (e.g., dropping a whole milestone)
-- Architecture fundamentally shifts
-
-**Do NOT create a revision for:**
-- Checking off tasks (normal progress)
-- Adding/removing small tasks
-- Clarifying wording
-
-Previous revision files stay in `plans/` as historical record — don't delete the original when creating a revision.
+**Create a revision (new `-r{R}` file) when:** the core technical approach changes, major scope is added/removed, or the architecture fundamentally shifts. **Not for:** checking off tasks, small task edits, or wording. Previous revision files stay in `plans/` as history — never delete the original.
 
 ## Plan Structure
 
-Every plan must have these sections:
+Every plan has these sections:
 
 ### 1. Context
 What problem this solves, why it's being built, key relationships and constraints. Written so an agent with zero prior context understands the full picture.
 
 ### 2. Design / Architecture
-Data models, API endpoints, flow diagrams, key decisions and their rationale. Include enough detail that implementation doesn't require guessing.
+Data models, API endpoints, flow diagrams, key decisions and their rationale. Enough detail that implementation doesn't require guessing.
 
 ### 3. Scenario Map (for complex changes only)
 
-**When to include this section:** Complex refactors, upgrades to existing systems, anything that changes behavior users already rely on, or features where multiple actors (end user, admin, operator) interact with overlapping states. Skip it in lightweight mode and for simple additive features.
-
-**Why this exists:** Plans written from a single happy-path perspective miss failure modes, edge cases, and state interactions — the things that actually cause production incidents. The scenario map forces you to enumerate every realistic user path before coding, so you spot gaps and ambiguities while they're cheap to resolve in the plan instead of discovering them mid-implementation or after ship.
+**Include for:** complex refactors, upgrades to existing systems, anything changing behavior users rely on, or features where multiple actors interact with overlapping states. **Skip for:** lightweight mode and simple additive features. Plans written from a single happy-path perspective miss the failure modes and state interactions that cause production incidents — this section forces the enumeration while gaps are still cheap to fix.
 
 **How to build the map:**
-1. **List the actors** — who interacts with this system? (end user, admin, operator, background job, etc.)
-2. **List the state dimensions** — flags, connection states, permissions, origin types, API outcomes (200/4xx/5xx), cached vs fresh, etc.
-3. **For each actor × state combination, write a row:** what the user does, what the system does, and whether the current plan already covers it.
-4. **Explicitly flag gaps** — rows where the plan is silent or ambiguous. Each gap must become one of: a new task in a milestone, a decision surfaced to the user via `AskUserQuestion`, or an explicit "out of scope" note.
-5. **Include adversarial and degraded states** — disconnected mid-flow, stale tokens, network failure, duplicate submissions, two tabs racing, concurrent toggles, downgrade paths, rollback.
+1. **List the actors** — end user, admin, operator, background job, etc.
+2. **List the state dimensions** — flags, connection states, permissions, API outcomes (200/4xx/5xx), cached vs fresh, etc.
+3. **For each actor × state combination, write a row:** what the user does, what the system does, whether the plan covers it.
+4. **Explicitly flag gaps** — rows where the plan is silent or ambiguous.
+5. **Include adversarial and degraded states** — disconnected mid-flow, stale tokens, duplicate submissions, two tabs racing, concurrent toggles, rollback.
 
-**Table format (recommended):**
+**Table format:**
 
 ```markdown
 ### A — [Actor name, e.g., "Admin dashboard user"]
@@ -99,16 +87,14 @@ Data models, API endpoints, flow diagrams, key decisions and their rationale. In
 | A3 | Feature on, API 5xx on write | Fall back vs hard fail | Gap — ask user |
 ```
 
-Group rows by actor (A, B, C…) so it stays scannable. Keep each row to one line — detail lives in the corresponding milestone task.
+Group rows by actor (A, B, C…). One line per row — detail lives in the milestone task.
 
-**Turn gaps into actions before plan approval:**
-- For each Gap row, either (a) add a task that handles it, (b) mark it "out of scope" with a one-line rationale, or (c) use `AskUserQuestion` to collect a decision and then fold the answer back into the plan.
-- Do NOT leave gaps unresolved. An unresolved gap in the plan becomes a bug in production.
+**Turn gaps into actions before plan approval.** Each Gap row becomes one of: (a) a new milestone task, (b) an explicit "out of scope" note with a one-line rationale, or (c) an `AskUserQuestion` whose answer gets folded back in. Never leave a gap unresolved — an unresolved gap in the plan becomes a bug in production.
 
-Example from a real plan: for a ticket-routing upgrade, the scenario map surfaced (1) what happens when the external API fails mid-chat, (2) whether disconnecting the connector should auto-reset the routing toggle, (3) duplicate ticket creation when a form is double-submitted, and (4) whether the toggle-off direction needs the same confirmation as toggle-on. None of these were obvious from the happy-path design, and each one changed a milestone.
+(Real example: a ticket-routing upgrade's scenario map surfaced mid-chat API failure handling, whether disconnecting a connector should reset a toggle, duplicate ticket creation on double-submit, and toggle-off confirmation — none obvious from the happy-path design, each changed a milestone.)
 
 ### 4. Milestones with Task Checkboxes
-The core of the plan. Each milestone is a logical chunk of work with:
+The core of the plan. Each milestone is a logical chunk of work:
 
 ```markdown
 ### Milestone N: Short Name
@@ -116,71 +102,45 @@ The core of the plan. Each milestone is a logical chunk of work with:
 
 Tests first (these will fail until implementation):
 - [ ] Write failing tests for X
-- [ ] Write failing tests for Y
 
 Then implement to make tests pass:
 - [ ] Implement X
-- [ ] Implement Y
 
 **Verification:**
 - [ ] How to confirm this milestone is done
 ```
 
-**TDD is required by default.** Every milestone that adds or changes behavior MUST list test tasks before implementation tasks. Tests are written first, confirmed to fail, then implementation makes them pass. This is non-negotiable unless the user explicitly opts out (e.g., "skip tests", "no tests for this"). If the user hasn't said to skip tests, include them.
-
-Milestones that are pure refactors of already-tested code (e.g., moving code without changing behavior) don't need new tests — but existing tests must still pass.
+**TDD is required by default.** Every milestone that adds or changes behavior lists test tasks before implementation tasks, unless the user explicitly opts out ("skip tests"). Pure refactors of already-tested code need no new tests, but existing tests must pass.
 
 Rules:
-- Tasks are concrete and actionable ("Create `src/auth/models.py`" not "Set up auth")
-- Include file paths where relevant
-- **Test tasks come before implementation tasks within each milestone** — this is the TDD ordering
-- Check off tasks (`- [x]`) as they are completed
-- Never remove completed tasks — they're the history
+- Tasks are concrete and actionable ("Create `src/auth/models.py`" not "Set up auth"), with file paths where relevant
+- Check off tasks (`- [x]`) as they complete; never remove completed tasks — they're the history
 
 ### 5. Progress Summary Table
-Quick at-a-glance status at the bottom of the file:
+At-a-glance status at the bottom of the file; update as milestones progress:
 
 ```markdown
 | Milestone | Status | Notes |
 |-----------|--------|-------|
 | 1. Name   | Done   |       |
 | 2. Name   | In progress | Blocked on X |
-| 3. Name   | Not started | |
 ```
-
-Update this table as milestones progress.
 
 ## Multi-Agent Development
 
-Plans are designed for parallel work. When a feature has independent milestones or tasks, **spawn agent teams or subagents** to work on different pieces concurrently.
+The plan file is the shared coordination point — all agents read from and write to it. Identify milestones/tasks with no dependencies between them and spawn subagents to work them concurrently (e.g., one builds auth models while another builds rate limiting); each agent checks off its own tasks. Never parallelize sequential tasks.
 
-**How it works:**
-- The plan file is the shared coordination point — all agents read from and write to it
-- Identify independent milestones/tasks that have no dependencies between them
-- Spawn subagents for independent work (e.g., one agent builds auth models while another builds rate limiting)
-- Each agent checks off its tasks in the plan as it completes them
-- Sequential tasks (where one depends on another) should NOT be parallelized
-
-**When to parallelize:**
-- Multiple milestones with no shared dependencies
-- Independent modules within a milestone (e.g., OTP service + JWT service)
-- Tests and implementation across separate files
-
-**Agent task prompts should include:**
-- Reference to the plan file: "Read `plans/v{N}-{description}.md` for full context"
-- Which specific milestone/tasks the agent owns
-- TDD requirement: write failing tests first, then implement
+Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}-{description}.md` for full context"), which milestone/tasks the agent owns, and the TDD requirement (failing tests first).
 
 ## Workflow
 
 ### Starting a new feature
-1. **Set `/effort max`** — planning requires deep reasoning. Always use max effort during the planning phase.
-2. Check `plans/` — find the next version number
-3. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. **NEVER write plans or implement code on `main`.** This applies to the plan file itself — even the plan commit goes on a branch.
-4. **Invoke `powerups:best-practices`** — this is not optional. Run the skill to ensure branching, codebase investigation (subagent), impact scan, and clarifying questions all happen before any code or plan is written. Do not just reference it — actually invoke it.
-5. **Skill audit — MANDATORY before writing the plan.** List every available powerups skill by name, then for each one, explicitly state whether it applies to this feature and why. Output this analysis to the user before proceeding. This ensures no skill is forgotten during planning or implementation.
+1. **Set `/effort max`** — planning requires deep reasoning.
+2. Check `plans/` — find the next version number.
+3. **Create a feature branch FIRST** — `git checkout -b feat/{description}`. Never write plans or code on `main` — even the plan commit goes on a branch.
+4. **Invoke `powerups:best-practices`** — actually invoke it, so branching, investigation, impact scan, and clarifying questions happen before any code or plan is written.
+5. **Skill audit — required before writing the plan.** List every available powerups skill by name; for each, state whether it applies to this feature and why. Output the analysis to the user.
 
-   Example output:
    ```
    Skill audit for v10-sync-change-details:
    - best-practices: YES — always applies (already invoked)
@@ -192,81 +152,62 @@ Plans are designed for parallel work. When a feature has independent milestones 
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
 
-   **Every skill marked YES must appear as an explicit task or note in the relevant milestone.** If `update-docs` applies, it MUST appear as a task in the final milestone or as a post-completion step. Do not rely on remembering — write it into the plan.
-6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Produce the discovery brief: problem statement, jobs-to-be-done, core flow, and decision matrix. Get the requester's answers to the hand-off questions. Its output feeds the Context and Design sections below and turns silent assumptions into explicit decisions. Skip only for mechanical/internal changes (rename, restyle, bugfix) or when the requester already specified exact behavior.
+   **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
+6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
 7. Create `plans/v{N}-{description}.md`
 8. Write Context and Design sections — grounded in the user-research brief when one was produced.
-9. **Scenario map (for complex refactors/upgrades):** Enumerate every realistic user path, grouped by actor, across all meaningful state combinations — including failures, disconnects, retries, stale state, and concurrent flips. Flag gaps. For every gap, either add a milestone task, mark it out of scope with a rationale, or ask the user via `AskUserQuestion` and fold the answer in. **Do not skip this for changes that modify existing behavior** — single-perspective plans miss the edges that break production. Skip it only for purely additive, lightweight, or internal-only features.
-10. Write the Milestones sections — include skill-specific tasks identified in step 5 and tasks that close every gap from step 9.
-11. Get user approval on the plan before coding
-12. Identify which milestones/tasks can be parallelized
-13. Begin work — spawn subagents for independent pieces
+9. **Scenario map** — build it per section 3 above for complex refactors/upgrades; resolve every gap before approval.
+10. Write the Milestones — include the skill tasks from step 5 and the gap-closing tasks from step 9.
+11. Get user approval on the plan before coding.
+12. Identify which milestones/tasks can be parallelized.
+13. Begin work — spawn subagents for independent pieces.
 
 ### After planning (before coding)
-Run `/update-docs` to check if the plan itself revealed stale documentation (e.g., the investigation found outdated CLAUDE.md entries, incorrect API references in sibling repos, or drift in integration guides). Fix any staleness before starting implementation.
+Run `/update-docs` to check if the planning investigation revealed stale documentation (outdated CLAUDE.md entries, incorrect API references in sibling repos). Fix staleness before implementing.
 
 ### Resuming work (new context, no memory)
-1. Spawn an `Explore` subagent to read `plans/` and return a summary: which plan is active, what milestone you're on, what the next unchecked task is, and any key design context. **Do not read plan files directly** — they are large and will bloat your context.
-2. Use the subagent's summary to orient yourself
-3. Find the first unchecked task — that's where to resume
-4. Continue working, checking off tasks as you go
+Follow the session-start rule from "When to Use": Explore subagent summarizes the plan, you orient from the summary, find the first unchecked task, and continue from there.
 
 ### During implementation
-- **Invoke `powerups:best-practices` at the task level** — TDD (write failing test, then implement), DRY (search before building), investigation (understand before changing). The plan organizes the work; `powerups:best-practices` governs how each task is executed. Actually invoke the skill, don't just follow it from memory.
-- Check off each task immediately when done: `- [ ]` → `- [x]`
-- Update the progress summary table when a milestone completes
-- If you discover new work, add tasks to the appropriate milestone
-- Commit the plan file alongside code changes
-- If the approach fundamentally changes (e.g., switching auth strategy), create a new revision file (`-r2`) rather than editing in place — keep the original as history
+- **Invoke `powerups:best-practices` at the task level** — the plan organizes the work; best-practices governs how each task is executed.
+- Check off each task immediately when done; update the progress table when a milestone completes.
+- If you discover new work, add tasks to the appropriate milestone.
+- Commit the plan file alongside code changes.
+- If the approach fundamentally changes, create a new revision file (`-r2`) rather than editing in place.
 
 #### Plan drift — keep the plan in sync with reality
 
-The plan is the **single source of truth**. The moment your implementation diverges from what's written, the plan stops being trustworthy and any agent resuming from it will be confused or repeat a failed approach. Every time a decision changes mid-flight, update the plan in the same commit as the code.
+The moment implementation diverges from what's written, the plan stops being trustworthy and any agent resuming from it repeats a failed approach. When a decision changes mid-flight, update the plan in the same commit as the code.
 
-**This rule is for small/medium drift** — a decision that changed, an approach that didn't work, a tweak to data shape, a different library choice. For *fundamental* approach changes (auth strategy, architecture pivot, dropping a milestone), use the `-r{R}` revision file mechanism above instead.
+This rule covers small/medium drift — a changed decision, an approach that didn't work, a different library. For *fundamental* changes, use the `-r{R}` revision mechanism instead.
 
-**Update additively — never rewrite history.** The original task wording and decisions stay visible so future readers can see what was tried and why it changed.
+**Update additively — never rewrite history:**
+1. Leave the original task/decision text as-is.
+2. Directly under it, add a `> **Revised ({YYYY-MM-DD}):**` callout: what was planned, what you actually did, why it changed.
+3. New tasks go as fresh checkboxes under the note; obsolete tasks get annotated `~~superseded — see revised note~~`, never deleted.
+4. Update the Design section the same way if the change affects documented design.
+5. **Commit the plan update with the code change** — one commit, both files.
 
-**How to record drift in-place:**
-1. Leave the original task / decision text as-is. Do not delete or rewrite it.
-2. Directly under it, add a `> **Revised ({YYYY-MM-DD}):**` callout that states:
-   - What was originally planned
-   - What you actually did
-   - Why it changed (didn't work, edge case, better approach surfaced, user redirected)
-3. If new tasks are needed, add them as fresh checkboxes under the revised note. If old tasks no longer apply, leave them visible and annotate `~~superseded — see revised note~~` (or check them with a `(superseded)` suffix) — never delete.
-4. Update the Design / Architecture section if the change affects the documented design. Same pattern: add a "Revised" note rather than overwriting.
-5. **Commit the plan update with the code change** — one commit, both files. A code change without the matching plan update is incomplete work.
-
-**Example:**
 ```markdown
 - [x] Use Redis for OTP storage with 5-minute TTL
-  > **Revised (2026-05-10):** Switched to Postgres with a `expires_at` column instead.
-  > Redis would have required a new dependency for one feature; the existing Postgres
-  > connection handles this with no infra change. TTL enforced via a cleanup job.
+  > **Revised (2026-05-10):** Switched to Postgres with an `expires_at` column.
+  > Redis would have required a new dependency for one feature; the existing
+  > Postgres connection handles this with no infra change.
 - [x] Add `expires_at` column and cleanup job for OTP rows
 ```
 
-**Why this matters:** Drift is silent. A task gets checked off because it's "done" in the developer's head, but the plan still describes the original approach. Six weeks later, someone reads the plan and is misled. Updating additively costs 30 seconds and keeps the plan honest.
-
 ### After each major milestone — pause for user testing
-When a milestone is complete (all tasks checked), **stop and let the user test manually** before moving on:
+When a milestone completes, stop and let the user test manually before moving on:
 
-1. **Provide step-by-step test instructions:**
-   - Prerequisites (env vars, server running, etc.)
-   - Exact commands to run (curl, browser URLs, SQL queries)
-   - Expected output for each step
-   - How to verify success vs. failure
-2. **Include setup steps** if the milestone introduced new dependencies, env vars, or configuration
-3. **Wait for user confirmation** that testing passed before starting the next milestone
-4. **Clear context** after successful testing — the plan file has all the state needed to resume in a fresh context
-
-This ensures the user validates each milestone incrementally rather than discovering issues after everything is built.
+1. **Provide step-by-step test instructions** — prerequisites, exact commands (curl, URLs, SQL), expected output, how to verify success vs. failure.
+2. **Include setup steps** for any new dependencies, env vars, or configuration.
+3. **Wait for user confirmation** before starting the next milestone.
+4. **Clear context after successful testing** — the plan file holds all the state needed to resume fresh.
 
 ### After all milestones complete — POST-COMPLETION AUDIT
 
-Just like the skill audit gates planning, the post-completion audit gates the PR. **You MUST output this audit to the user before creating the PR** — list each step, its status (done/not done), and evidence (e.g., "24 tests pass", "CHANGELOG.md updated with entry for..."). Do NOT create the PR until every item shows as done.
+The audit gates the PR. **Output it to the user before creating the PR** — each step, its status, and evidence. Do not create the PR until every item is done.
 
-**Post-completion audit output format:**
 ```
 Post-completion audit:
 1. Skill audit review:     DONE — all 5 YES skills executed (best-practices, TDD, simple-design, update-docs, change-log)
@@ -280,68 +221,48 @@ Post-completion audit:
 8. PR ready:               YES — manual verification steps included
 ```
 
-**The 8 steps:**
+**The steps:**
 
-1. **Skill audit review** — go back to your skill audit output and confirm every YES skill was actually executed. If any was missed, execute it now.
+1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
+2. **`powerups:drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
+3. **Steps 3–7: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
+4. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
-2. **Run `powerups:drift-audit`** — actually invoke the skill; it owns all the detail. It reconciles shipped code with the plan in both directions (additive and subtractive drift). NOT optional, and it runs BEFORE `/simplify` so the cleanup is informed by both directions — `/simplify` shouldn't refactor code that's about to be deleted as drift.
+### PR manual verification steps — required
 
-3. **Run `/simplify`** — review all changed code for reuse, quality, and efficiency. Fix any issues found. This is NOT optional.
-4. **Run `powerups:change-log`** — add an entry to `CHANGELOG.md` in plain, business-user-friendly language. This is NOT optional for user-facing changes.
-5. **Run `update-docs`** — sync all documentation (CLAUDE.md, guides, sibling repos). This is NOT optional.
-6. **Run the project's linter** — fix any lint errors introduced by your changes.
-7. **Run the FULL test suite** — `pytest` (or the project's test command). ALL tests must pass. This catches regressions where new code breaks existing tests. A green test suite is a hard gate.
-8. **Create PR** with manual verification steps (see below). Reference the drift section in the body so reviewers don't have to reverse-engineer scope creep.
+Every PR includes a **Manual verification** section reviewers can follow. Automated tests verify code correctness — manual steps verify feature correctness.
 
-**Why this matters:** Skipping post-completion steps is the #1 cause of broken PRs. The drift audit catches both plan rot (additive) and repo straggle (subtractive). `/simplify` catches code-quality issues. `update-docs` catches stale documentation. The full test suite catches regressions. Each step exists because skipping it has caused real problems.
-
-### PR manual verification steps — MANDATORY
-
-Every PR must include a **Manual verification** section with step-by-step instructions the reviewer can follow to verify the feature works. Automated tests verify code correctness — manual steps verify feature correctness. These are different things.
-
-**Requirements:**
-- Each scenario is numbered with a descriptive title (e.g., "1. Widget: Talk to Human button")
-- Steps are sequential and specific — exact actions to take, not vague descriptions
-- Each step that checks behavior has a **Verify:** line stating what the reviewer should see
-- Include prerequisites if needed (env vars, server running, test data)
+- Number each scenario with a descriptive title
+- Steps are sequential and specific — exact actions, with prerequisites (env vars, server, test data)
+- Each behavior check gets a **Verify:** line stating what the reviewer should see
 - Cover the golden path, at least one edge case, and a no-regressions check
 
-**Example structure:**
 ```markdown
 ## Manual verification
 
 ### 1. Creating a new widget
 1. Start local dev (`npm run dev`)
 2. Navigate to the dashboard → Widgets page
-3. Click "Create Widget"
-4. Fill in name: "Test Widget", select theme: "Dark"
-5. Click Save
-6. **Verify:** Widget appears in the list with name "Test Widget" and dark theme badge
-7. **Verify:** Toast shows "Widget created"
+3. Click "Create Widget", fill in name: "Test Widget", theme: "Dark", Save
+4. **Verify:** Widget appears in the list with name "Test Widget" and dark theme badge
+5. **Verify:** Toast shows "Widget created"
 
 ### 2. Edge case: duplicate name
-1. Try creating another widget with name "Test Widget"
-2. **Verify:** Error message "A widget with this name already exists"
-3. **Verify:** No duplicate created in the list
+1. Create another widget named "Test Widget"
+2. **Verify:** Error "A widget with this name already exists"; no duplicate in the list
 
 ### 3. No regressions
 - [ ] Existing widgets still display correctly
-- [ ] Widget settings page still loads
 - [ ] Delete widget still works
 ```
 
-**Do NOT** write vague test plans like "verify it works" or "check the UI". Every step should be reproducible by someone who has never seen the feature.
+Never write vague test plans ("verify it works"). Every step should be reproducible by someone who has never seen the feature.
 
 ### Rolling back work
-If code is reverted or the developer isn't happy with the implementation:
-- Uncheck tasks back to the rolled-back state: `- [x]` → `- [ ]`
-- Update the progress summary table to reflect the actual state
-- The plan must always match reality — if code was reverted, the checkboxes must revert too
+If code is reverted, the plan reverts too: uncheck the rolled-back tasks (`- [x]` → `- [ ]`) and update the progress table. The plan must always match reality.
 
 ### Completing a plan
-- All checkboxes checked
-- Progress summary shows all milestones as "Done"
-- Plan stays in `plans/` as historical record
+All checkboxes checked, progress table all "Done", plan stays in `plans/` as historical record.
 
 ## Common Mistakes
 
@@ -349,10 +270,7 @@ If code is reverted or the developer isn't happy with the implementation:
 |---------|-----|
 | Starting to code without checking `plans/` | Always check first — you may be mid-feature |
 | Vague tasks ("set up auth") | Be specific: file paths, endpoint names, model fields |
-| Forgetting to check off tasks | Update immediately — the plan is only useful if current |
-| Creating a plan for a 10-minute fix | Use PDD lightweight mode — no plan file, but still follow all PDD rules |
+| Creating a plan file for a 10-minute fix | Use lightweight mode — no file, but all PDD rules still apply |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
-| Running all tasks sequentially | Identify independent work and spawn subagents |
-| Writing a plan with no tests at all | Every milestone that adds behavior needs test tasks. If you forgot them, add them before starting implementation |
-| Skipping the full test suite before creating the PR | Tests and code can drift independently (e.g., fixtures use old table names while code uses new ones). A full suite run is the only way to catch this |
-| Implementing differently than planned without updating the plan | Update the plan additively (`> **Revised:**` note under the original task) in the same commit as the code — never rewrite history. The drift audit (post-completion step 2) is the last chance to catch this before the PR |
+| Skipping the full suite before the PR | Tests and code drift independently (fixtures on old table names). A full run is the only way to catch it |
+| Implementing differently than planned without updating the plan | Add a `> **Revised:**` note in the same commit as the code. The drift audit is the last chance to catch this before the PR |
