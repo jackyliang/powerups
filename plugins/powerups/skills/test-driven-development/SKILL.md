@@ -16,8 +16,8 @@ If you didn't watch the test fail, you don't know if it tests the right thing. T
 **Always:**
 - New features (small or large)
 - Bug fixes
-- Refactoring
 - Behavior changes
+- Refactoring — pure behavior-preserving refactors of already-tested code need no *new* tests, but existing tests must stay green throughout
 - When using plan-driven-development (TDD integrates into milestone tasks)
 
 **Exceptions (ask the user first):**
@@ -130,8 +130,8 @@ Tests must hit real infrastructure:
 | **Database operations** | Real Postgres with cleanup-based isolation |
 | **API endpoints** | Full HTTP via FastAPI test client against real DB |
 | **Service classes** | Instantiate real classes, call real methods |
-| **Provider APIs (Zendesk, etc.)** | Real API with test credentials, or VCR cassettes as last resort |
-| **Nango OAuth** | Nango sandbox/test environment |
+| **Third-party provider APIs** | Real API with test credentials, or recorded fixtures (VCR cassettes) as last resort |
+| **OAuth flows** | The provider's sandbox/test environment |
 
 **The only acceptable mock:** A third-party API that has no sandbox, no test environment, and charges per call. Document why with a comment above the mock:
 
@@ -214,7 +214,7 @@ The team lead must verify:
 | **Data models** | Create real instances → verify constraints, defaults, relationships |
 | **Business logic** | Pure functions → verify input/output for normal cases AND edge cases |
 | **Error handling** | Trigger real errors → verify correct error codes and messages |
-| **Sync engine** | Run real syncs → verify data lands in correct schema/table |
+| **Background jobs / pipelines** | Run the real job → verify output lands where expected |
 
 ### Edge Cases to Always Cover
 

@@ -108,19 +108,13 @@ If any other test broke, fix the regression **without breaking the original fix*
 
 **Success criteria:** No debug artifacts remain in the diff.
 
-### Step 9: Simplify
+### Step 9: Finishing sequence
 
-**Run `/simplify`** — review changed code for reuse, quality, and efficiency. Fix issues found.
+Run the finishing sequence from `powerups:best-practices` practice #9: `/simplify`, `powerups:change-log` (skip if the fix isn't user-facing), `update-docs`, and lint. The full test suite already ran in Step 7.
 
-**Success criteria:** No duplicate code, N+1 queries, or anti-patterns in the diff.
+**Success criteria:** Simplify findings fixed, CHANGELOG.md updated (if user-facing), docs synced, linter clean on changed files.
 
-### Step 10: Update change log
-
-**Run `powerups:change-log`** — add an entry to `CHANGELOG.md` describing the fix in plain, business-user-friendly language. Skip this step only if the fix is purely internal (not user-facing).
-
-**Success criteria:** `CHANGELOG.md` has a new entry for today's date.
-
-### Step 11: Commit and PR
+### Step 10: Commit and PR
 
 ```bash
 git add <specific files>

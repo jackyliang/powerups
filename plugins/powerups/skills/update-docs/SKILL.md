@@ -169,9 +169,6 @@ When you find this, **recommend consolidation** before making edits. Ask the use
 
 - **Scan everything.** Local docs AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
 - **All investigation in subagents.** Reading docs consumes context. Subagents read and return concise diffs.
-- **Ask before editing.** Show the user what's stale and get approval before making changes.
-- **Ask about framing and depth.** Use `AskUserQuestion` to clarify scope, audience, tone, and what to remove vs. keep.
-- **Commit per repo.** Don't mix changes across repos in one commit.
 - **Don't add docs that don't exist.** This skill updates existing docs, not creates new ones. If a doc is missing entirely, flag it and ask the user if they want it created.
 - **Flag scatter, don't perpetuate it.** If the same integration is partially documented in multiple places, recommend consolidation before adding more partial docs.
 

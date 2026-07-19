@@ -36,7 +36,7 @@ Write for business users, not developers. A high schooler should understand ever
 | **Empty states** | Encouraging. Tell the user what to do next, not describe system state. | "Add your first website to get started" not "No websites configured" |
 | **Error messages** | Blame the system, not the user. Suggest a next step. | "Something went wrong. Try again." not "Invalid request payload" |
 | **Tooltips** | One sentence explaining why this matters or what it does. | "Visitors will see this name in the chat window" |
-| **Page titles** | Plain text, no icons in h1. Describe what the page is for. | "Knowledge vault" not "Knowledge vault" |
+| **Page titles** | Plain text, no icons in h1. Describe what the page is for. | "Knowledge vault" not "📚 Knowledge vault" |
 | **Descriptions** | One line under the title explaining what the user can do here. | "Add websites and articles your assistant can search" |
 
 ## UI Component Consistency
