@@ -68,7 +68,7 @@ Two capture paths, in order of preference:
   # makes an unwatchably wide recording
   osascript -e 'tell application "Google Chrome" to set bounds of front window to {100, 100, 1380, 900}'
   ```
-  Then cut the tab strip, omnibox, and bookmarks bar out of the region — they're noise, not proof. With DevTools closed, measure the browser-chrome height from inside the page (`window.outerHeight - window.innerHeight` via `javascript_tool`) and record just the content:
+  Then cut the tab strip, omnibox, and bookmarks bar out of the region — they're noise, not proof. First hide the bookmarks bar (`osascript` keystroke `Cmd+Shift+B`, or ensure it's off) so the chrome height is deterministic. With DevTools closed, measure the browser-chrome height from inside the page (`window.outerHeight - window.innerHeight` via `javascript_tool`) and record just the content:
   ```bash
   # x stays 100; y = 100 + chrome height; w,h = innerWidth,innerHeight
   screencapture -x -v -R 100,<100+chromeH>,<innerW>,<innerH> flow.mov &
@@ -113,6 +113,7 @@ Either way:
 - **Never fake the environment.** No hardcoded data, mocked endpoints, or commented-out auth to make the demo work. If the demo needs something you don't have, ask.
 - **Keep it short.** A reviewer should get to "yep, it works" in under 30 seconds of playback. Cut setup and navigation dead time by starting recording close to the flow.
 - **One flow per recording.** Multiple independent changes get multiple short recordings.
+- **Viewport only — never record browser chrome.** When using the browser, the recording must show only the page viewport. Crop the tab strip, omnibox, and bookmarks bar out of every recording. If you can't crop the chrome out (no screen-recording permission, non-macOS), use `gif_creator`, which captures tab content only.
 
 ## Anti-Patterns
 
