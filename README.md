@@ -17,7 +17,7 @@ Reusable [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills fo
 | **self-documenting-apis** | Ensure FastAPI endpoints have docstrings, typed response/request models, and proper status codes so auto-generated docs are the single source of truth. |
 | **update-docs** | Sync all documentation after completing a feature. Finds stale content across CLAUDE.md, README, public skills/plugins, and downstream project docs. |
 | **drift-audit** | Run before the PDD post-completion audit. Reconciles shipped code vs the plan in both directions — additive drift (unplanned things that landed) and subtractive drift (orphan files, completed Post-MVP items, stale TODOs, dead redirect stubs). |
-| **qq** | Quick-question mode. Ultra-short answers and drafts. Drafted texts/messages and emails fit under 480 characters — no greetings, sign-offs, or preamble. |
+| **qq** | Quick-question mode. Ultra-short answers and drafts in ASD-STE100 Simplified Technical English. Texts, social posts, and emails under 480 characters (280 per tweet for X) — no greetings, sign-offs, preamble, or em-dashes. |
 
 ## Install
 
