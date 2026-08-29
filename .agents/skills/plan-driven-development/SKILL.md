@@ -131,10 +131,13 @@ The milestone covers, as applicable:
 - [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one
 - [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
 - [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
+- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page
 - [ ] Build and preview the site locally; confirm generated files regenerated
 - [ ] Email/social distribution, if the repo has that pipeline
 
 Gate the milestone on the feature actually being live — a docs page for something not yet deployed is worse than no page.
+
+**Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. Drive the running app yourself (browser/computer tool), capture each state the post describes, and commit the files where the site keeps its images — matching the existing naming/directory convention, referenced the way existing posts reference theirs. Rules: real data (or realistic seeded data), never lorem or an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame; crop to the feature, not the whole desktop; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (a CLI/API-only feature), use a terminal capture or a fenced code block rather than skipping the visual entirely.
 
 ### 6. Progress Summary Table
 At-a-glance status at the bottom of the file; update as milestones progress:
@@ -247,7 +250,7 @@ Post-completion audit:
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
 6. Linter:                 DONE — no new warnings
 7. Full test suite:        DONE — 133 passed, 0 failed
-8. Marketing surfaces:     DONE — docs page + blog post + pricing tier line (../marketing-site PR #12)
+8. Marketing surfaces:     DONE — docs page + blog post (4 screenshots) + pricing tier line (../marketing-site PR #12)
 9. PR ready:               YES — manual verification steps included
 ```
 
@@ -255,7 +258,7 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs page, blog/changelog post, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
+3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs page, blog/changelog post with real screenshots, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
 4. **Steps 3–7: the finishing sequence from `best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
 5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
@@ -305,5 +308,6 @@ All checkboxes checked, progress table all "Done", plan stays in `plans/` as his
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Shipping the code and calling the feature done | User-visible features aren't done until the marketing site says they exist — docs page, post, pricing line |
 | Hand-editing generated marketing pages (`blog/`, `sitemap.xml`) | Edit the source content and run the site's build |
+| A blog post describing a UI with no screenshots | Drive the running app and capture the real screens — you have a browser |
 | Skipping the full suite before the PR | Tests and code drift independently (fixtures on old table names). A full run is the only way to catch it |
 | Implementing differently than planned without updating the plan | Add a `> **Revised:**` note in the same commit as the code. The drift audit is the last chance to catch this before the PR |
