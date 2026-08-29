@@ -113,11 +113,33 @@ Then implement to make tests pass:
 
 **TDD is required by default.** Every milestone that adds or changes behavior lists test tasks before implementation tasks, unless the user explicitly opts out ("skip tests"). Pure refactors of already-tested code need no new tests, but existing tests must pass.
 
+**A user-visible feature's last milestone is the marketing surfaces** (see below), not the code. Shipping the code and stopping means the feature exists and nobody outside the dashboard knows it does.
+
 Rules:
 - Tasks are concrete and actionable ("Create `src/auth/models.py`" not "Set up auth"), with file paths where relevant
 - Check off tasks (`- [x]`) as they complete; never remove completed tasks — they're the history
 
-### 5. Progress Summary Table
+### 5. Marketing Surfaces (user-visible features only)
+
+In-repo docs (`docs/`, `CLAUDE.md`, `CHANGELOG.md`) are for whoever maintains the code. They do nothing for the person deciding whether to buy or how to turn the feature on. The public site is a separate repo with its own conventions, so it gets its own milestone with explicit tasks — otherwise it is always the thing that never happens.
+
+Find the marketing repo first (a sibling checkout, or the `../` paths in `CLAUDE.md`) and read its conventions before writing tasks — generated directories, a required post pipeline, front-matter schemas. Never hand-edit generated output.
+
+The milestone covers, as applicable:
+
+- [ ] **Docs/help page** — how a customer turns the feature on and uses it, plus its limits
+- [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one
+- [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
+- [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
+- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page
+- [ ] Build and preview the site locally; confirm generated files regenerated
+- [ ] Email/social distribution, if the repo has that pipeline
+
+Gate the milestone on the feature actually being live — a docs page for something not yet deployed is worse than no page.
+
+**Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. Drive the running app yourself (browser/computer tool), capture each state the post describes, and commit the files where the site keeps its images — matching the existing naming/directory convention, referenced the way existing posts reference theirs. Rules: real data (or realistic seeded data), never lorem or an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame; crop to the feature, not the whole desktop; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (a CLI/API-only feature), use a terminal capture or a fenced code block rather than skipping the visual entirely.
+
+### 6. Progress Summary Table
 At-a-glance status at the bottom of the file; update as milestones progress:
 
 ```markdown
@@ -152,6 +174,14 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
    - update-docs: YES — run after all milestones complete
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
+
+   Add one more line to the audit for **marketing surfaces** — the public site (marketing/docs/blog/pricing repo), which is not a powerups skill but drifts the same way:
+
+   ```
+   - marketing surfaces: YES — merchants can see this; needs a docs page + blog post + pricing line
+   ```
+
+   If YES, the plan gets a final milestone for it (see "Marketing surfaces" below). If NO — internal refactor, infra, dev-only tooling — say so in one line and move on.
 
    **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
 6. **Run `user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
@@ -220,15 +250,17 @@ Post-completion audit:
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
 6. Linter:                 DONE — no new warnings
 7. Full test suite:        DONE — 133 passed, 0 failed
-8. PR ready:               YES — manual verification steps included
+8. Marketing surfaces:     DONE — docs page + blog post (4 screenshots) + pricing tier line (../marketing-site PR #12)
+9. PR ready:               YES — manual verification steps included
 ```
 
 **The steps:**
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **Steps 3–7: the finishing sequence from `best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
-4. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
+3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs page, blog/changelog post with real screenshots, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
+4. **Steps 3–7: the finishing sequence from `best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
+5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
 ### PR manual verification steps — required
 
@@ -274,5 +306,8 @@ All checkboxes checked, progress table all "Done", plan stays in `plans/` as his
 | Vague tasks ("set up auth") | Be specific: file paths, endpoint names, model fields |
 | Creating a plan file for a 10-minute fix | Use lightweight mode — no file, but all PDD rules still apply |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
+| Shipping the code and calling the feature done | User-visible features aren't done until the marketing site says they exist — docs page, post, pricing line |
+| Hand-editing generated marketing pages (`blog/`, `sitemap.xml`) | Edit the source content and run the site's build |
+| A blog post describing a UI with no screenshots | Drive the running app and capture the real screens — you have a browser |
 | Skipping the full suite before the PR | Tests and code drift independently (fixtures on old table names). A full run is the only way to catch it |
 | Implementing differently than planned without updating the plan | Add a `> **Revised:**` note in the same commit as the code. The drift audit is the last chance to catch this before the PR |
