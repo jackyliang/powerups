@@ -46,6 +46,14 @@ Spawn an `Explore` subagent to discover every doc file that might need updating.
 4. **`.env.example`** — env var reference
 5. **`plans/`** — plan files with status tables or task checkboxes
 
+**Marketing / public site (always scan when the change is user-visible):**
+
+The public site is usually its own repo (marketing pages, `docs/`, `blog/`, `pricing/`). It is the only documentation customers actually read, and it drifts hardest because it lives outside the code repo:
+1. **Docs/help pages** — does a page exist for this feature, and does it describe current behavior, limits, and setup?
+2. **Pricing page** — plan gating changed? The tier a feature requires is a factual claim customers hold you to.
+3. **Blog/changelog** — is there an announcement for a shipped user-visible feature? If not, flag it (this skill doesn't write posts; the site's own writing pipeline does).
+4. **Generated output** — `blog/`, `sitemap.xml`, and similar are build artifacts in many static sites. Edit the source content and run the site's build; never hand-edit them.
+
 **Sibling repos (always scan):**
 
 Grep CLAUDE.md for `../` paths to find sibling repos. For EVERY sibling repo found:
@@ -167,7 +175,7 @@ When you find this, **recommend consolidation** before making edits. Ask the use
 
 ## Rules
 
-- **Scan everything.** Local docs AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
+- **Scan everything.** Local docs, the marketing/public site, AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
 - **All investigation in subagents.** Reading docs consumes context. Subagents read and return concise diffs.
 - **Don't add docs that don't exist.** This skill updates existing docs, not creates new ones. If a doc is missing entirely, flag it and ask the user if they want it created.
 - **Flag scatter, don't perpetuate it.** If the same integration is partially documented in multiple places, recommend consolidation before adding more partial docs.
