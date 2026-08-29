@@ -28,6 +28,24 @@ In Claude Code, run:
 /plugin install powerups@powerups
 ```
 
+### Devin
+
+Nothing to install. `.agents/skills/` in this repo is a generated mirror of
+`plugins/powerups/skills/`, and Devin indexes `.agents/skills/<name>/SKILL.md`
+across connected repos, so the skills are available in every Devin session
+(`@skills:bug-fix`, `@skills:qq`, ...).
+
+The mirror is regenerated and committed by the `Sync Devin skills` GitHub
+Action on every push to `main` that touches the plugin skills. Run it by hand
+with:
+
+```
+python3 scripts/sync-devin-skills.py
+```
+
+Edit skills only under `plugins/powerups/skills/` — `.agents/skills/` is
+overwritten.
+
 ## License
 
 MIT
