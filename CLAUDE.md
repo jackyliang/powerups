@@ -15,6 +15,7 @@ Both files must have the **exact same version string**. Use semver: bump patch f
 
 ```
 powerups/
+├── .agents/skills/             ← GENERATED mirror for Devin (do not edit)
 ├── .claude-plugin/
 │   └── marketplace.json        ← marketplace manifest (has version)
 ├── plugins/powerups/
@@ -33,8 +34,18 @@ powerups/
 │       ├── test-driven-development/
 │       ├── update-docs/
 │       └── user-research/
+├── scripts/
+│   └── sync-devin-skills.py    ← regenerates .agents/skills/
 └── README.md
 ```
+
+## Devin Mirror — MANDATORY
+
+`.agents/skills/` is generated from `plugins/powerups/skills/` by
+`scripts/sync-devin-skills.py`. Never edit it by hand. The `Sync Devin skills`
+GitHub Action regenerates and commits it on every push to `main` that touches
+the plugin skills; if you change skills locally and want the mirror in the same
+commit, run the script yourself.
 
 ## Updating README — MANDATORY
 
