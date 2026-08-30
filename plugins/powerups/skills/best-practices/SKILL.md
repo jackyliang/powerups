@@ -78,6 +78,8 @@ If the change touches anything the user sees, invoke both:
 - `simple-design-principles` — copy and labels, toasts, empty states, error messages, component selection
 - `frontend-design` — visual design for new or modified components, pages, loading/error states
 
+And if the change needs a picture of the UI anywhere a customer will see it — docs page, blog or changelog post, landing section, launch or social post, deck — invoke `powerups:mockups`. It owns how those images are made; never hand-crop a desktop screenshot.
+
 ### 8. Self-Documenting APIs
 
 If the change adds or modifies API endpoints, invoke `self-documenting-apis` — endpoint docstrings, typed request/response models with field descriptions, status codes, router tags. Auto-generated docs (`/docs`, `/redoc`) are the only API reference; never maintain a separate api-reference.md.

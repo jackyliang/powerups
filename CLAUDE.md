@@ -27,6 +27,7 @@ powerups/
 │       ├── change-log/
 │       ├── drift-audit/
 │       ├── give-me-five/
+│       ├── mockups/
 │       ├── plan-driven-development/
 │       ├── qq/
 │       ├── self-documenting-apis/
