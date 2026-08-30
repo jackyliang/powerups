@@ -130,7 +130,7 @@ The milestone covers, as applicable:
 - [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one. Keep it SHORT: highlights only, and link to the docs article for the full installation and usage flow — the blog never duplicates the docs
 - [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
 - [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
-- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page. If a mockup generator workflow exists (e.g. a `/mockups` playbook that frames raw captures into styled marketing images), run the raw captures through it for marketing surfaces instead of shipping raw screenshots
+- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page. For marketing surfaces, never ship raw screenshots — run the raw captures through the `/mockups` mockup generator (the Devin `!mockups` playbook: raw CDP capture → Shots.so framing → exported marketing image)
 - [ ] Build and preview the site locally; confirm generated files regenerated
 - [ ] Email/social distribution, if the repo has that pipeline
 
