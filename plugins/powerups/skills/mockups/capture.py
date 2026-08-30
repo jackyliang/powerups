@@ -137,7 +137,9 @@ def page_target(cdp):
 
 
 async def capture(args):
-    async with websockets.connect(page_target(args.cdp), max_size=None) as ws:
+    async with websockets.connect(
+        page_target(args.cdp), max_size=None, ping_interval=None
+    ) as ws:
         page = Session(ws)
         await page.send("Page.enable")
         await page.send("Runtime.enable")
