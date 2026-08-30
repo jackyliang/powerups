@@ -126,8 +126,8 @@ Find the marketing repo first (a sibling checkout, or the `../` paths in `CLAUDE
 
 The milestone covers, as applicable:
 
-- [ ] **Docs/help page** — how a customer turns the feature on and uses it, plus its limits
-- [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one
+- [ ] **Docs article** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. For Answer HQ this is a "Knowledge Article" (the product's name — never call it a help center) published under `app.answerhq.co/answerhq/articles/`. Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one
+- [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one. Keep it SHORT: highlights only, and link to the docs article for the full installation and usage flow — the blog never duplicates the docs
 - [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
 - [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
 - [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page
@@ -257,7 +257,7 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`powerups:drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs page, blog/changelog post with real screenshots, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
+3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs article with the full flow, short highlights blog/changelog post linking to it, real screenshots, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
 4. **Steps 3–7: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
 5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
