@@ -127,11 +127,11 @@ Find the marketing repo first (a sibling checkout, or the `../` paths in `CLAUDE
 
 The milestone covers, as applicable:
 
-- [ ] **Docs article** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. For Answer HQ this is a "Knowledge Article" (the product's name — never call it a help center) published under `app.answerhq.co/answerhq/articles/`. Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one
+- [ ] **Docs article** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. Use the product's own name for its docs surface (check the marketing repo/CLAUDE.md). Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one
 - [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one. Keep it SHORT: highlights only, and link to the docs article for the full installation and usage flow — the blog never duplicates the docs
 - [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
 - [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
-- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page
+- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page. If a mockup generator workflow exists (e.g. a `/mockups` playbook that frames raw captures into styled marketing images), run the raw captures through it for marketing surfaces instead of shipping raw screenshots
 - [ ] Build and preview the site locally; confirm generated files regenerated
 - [ ] Email/social distribution, if the repo has that pipeline
 
