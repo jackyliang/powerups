@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Capture a retina screenshot of one element of a running page, over CDP.
 
-    python3 scripts/capture.py URL SELECTOR OUT.png [options]
+    python3 <skill-dir>/capture.py URL SELECTOR OUT.png [options]
 
 Marketing screenshots are worthless at 1x: the blog renders heroes around
 1000 CSS px wide, so a 1x capture is already soft and a retina screen halves
@@ -38,8 +38,8 @@ Options:
               typing a password into a script.
   --cdp       Chrome DevTools endpoint (default http://localhost:29229).
 
-Needs a Chrome already listening on --cdp, and the packages in
-scripts/requirements.txt.
+Needs a Chrome already listening on --cdp, plus pillow>=11 and
+websockets>=14 (`python3 -m pip install "pillow>=11.0" "websockets>=14.0"`).
 """
 
 import argparse
