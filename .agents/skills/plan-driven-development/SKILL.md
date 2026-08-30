@@ -131,13 +131,13 @@ The milestone covers, as applicable:
 - [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one. Keep it SHORT: highlights only, and link to the docs article for the full installation and usage flow — the blog never duplicates the docs
 - [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
 - [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
-- [ ] **Screenshots** — capture the real feature from the running app and embed them in the post and docs page. For marketing surfaces, never ship raw screenshots — run the raw captures through the `/mockups` mockup generator (the Devin `!mockups` playbook: raw CDP capture → Shots.so framing → exported marketing image)
+- [ ] **Screenshots** — capture the real feature from the running app via `mockups` and embed them in the post and docs page
 - [ ] Build and preview the site locally; confirm generated files regenerated
 - [ ] Email/social distribution, if the repo has that pipeline
 
 Gate the milestone on the feature actually being live — a docs page for something not yet deployed is worse than no page.
 
-**Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. Drive the running app yourself (browser/computer tool), capture each state the post describes, and commit the files where the site keeps its images — matching the existing naming/directory convention, referenced the way existing posts reference theirs. Rules: real data (or realistic seeded data), never lorem or an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame; crop to the feature, not the whole desktop; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (a CLI/API-only feature), use a terminal capture or a fenced code block rather than skipping the visual entirely.
+**Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. Invoke `mockups` — it owns how our images are made (raw CDP capture of the element, then the Shots.so recipe), so never hand-crop a desktop screenshot or invent a background here. Commit the exports where the site keeps its images, matching the existing naming/directory convention and referenced the way existing posts reference theirs. Rules: real data (or realistic seeded data), never lorem or an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame — `mockups` will ask before shipping anything a customer wrote; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (a CLI/API-only feature), use a terminal capture or a fenced code block rather than skipping the visual entirely.
 
 ### 6. Progress Summary Table
 At-a-glance status at the bottom of the file; update as milestones progress:
@@ -172,6 +172,7 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
    - simple-design-principles: YES — frontend UI with user-facing copy
    - self-documenting-apis: YES — new API endpoint
    - update-docs: YES — run after all milestones complete
+   - mockups: YES — the blog post and docs page need product screenshots
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
 
@@ -308,6 +309,6 @@ All checkboxes checked, progress table all "Done", plan stays in `plans/` as his
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
 | Shipping the code and calling the feature done | User-visible features aren't done until the marketing site says they exist — docs page, post, pricing line |
 | Hand-editing generated marketing pages (`blog/`, `sitemap.xml`) | Edit the source content and run the site's build |
-| A blog post describing a UI with no screenshots | Drive the running app and capture the real screens — you have a browser |
+| A blog post describing a UI with no screenshots | Invoke `mockups` and shoot the real screens — you have a browser |
 | Skipping the full suite before the PR | Tests and code drift independently (fixtures on old table names). A full run is the only way to catch it |
 | Implementing differently than planned without updating the plan | Add a `> **Revised:**` note in the same commit as the code. The drift audit is the last chance to catch this before the PR |

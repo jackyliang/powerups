@@ -50,7 +50,7 @@ Spawn an `Explore` subagent to discover every doc file that might need updating.
 **Marketing / public site (always scan when the change is user-visible):**
 
 The public site is usually its own repo (marketing pages, `docs/`, `blog/`, `pricing/`). It is the only documentation customers actually read, and it drifts hardest because it lives outside the code repo:
-1. **Docs/help pages** — does a page exist for this feature, and does it describe current behavior, limits, and setup?
+1. **Docs/help pages** — does a page exist for this feature, and does it describe current behavior, limits, and setup? Check the **screenshots** too: a shot of a screen that has since changed is the stalest kind of doc, and re-shooting is `mockups`, not a hand-cropped grab.
 2. **Pricing page** — plan gating changed? The tier a feature requires is a factual claim customers hold you to.
 3. **Blog/changelog** — is there an announcement for a shipped user-visible feature? If not, flag it (this skill doesn't write posts; the site's own writing pipeline does).
 4. **Generated output** — `blog/`, `sitemap.xml`, and similar are build artifacts in many static sites. Edit the source content and run the site's build; never hand-edit them.
