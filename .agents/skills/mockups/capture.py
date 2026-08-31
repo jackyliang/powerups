@@ -28,8 +28,10 @@ Options:
   --click     click the first element whose text contains this string, before
               the shot; repeatable, in order. Use it to put the page in the
               state worth shooting (a tab, a row, a range).
-  --eval      JavaScript to run before the shot; repeatable. The escape hatch
-              for anything --click and --hide can't express.
+  --eval      JavaScript to run before the shot; repeatable, in order, each
+              followed by --wait ms so an answer or a fetch it kicked off has
+              time to render. The escape hatch for anything --click and
+              --hide can't express.
   --storage   KEY=ENV_VAR to seed into localStorage on the page's origin
               before loading it; repeatable. The value is read from that
               environment variable, never passed on the command line, so an
@@ -48,7 +50,6 @@ import base64
 import io
 import json
 import os
-from urllib.parse import urlsplit
 from urllib.request import urlopen
 
 import websockets
@@ -162,12 +163,14 @@ async def capture(args):
                 if env_var not in os.environ:
                     raise SystemExit(f"${env_var} is not set, needed for localStorage {key!r}")
                 items.append((key, os.environ[env_var]))
-            origin = urlsplit(args.url)
-            await page.goto(f"{origin.scheme}://{origin.netloc}/", 0)
-            for key, value in items:
-                await page.evaluate(
-                    f"localStorage.setItem({json.dumps(key)}, {json.dumps(value)}), 1"
-                )
+            seed = ";".join(
+                f"localStorage.setItem({json.dumps(key)}, {json.dumps(value)})"
+                for key, value in items
+            )
+            await page.send(
+                "Page.addScriptToEvaluateOnNewDocument",
+                source=f"try{{{seed}}}catch(e){{}}",
+            )
 
         await page.goto(args.url, args.wait)
 
@@ -187,6 +190,7 @@ async def capture(args):
 
         for script in args.eval:
             await page.evaluate(f"({script}), 1")
+            await asyncio.sleep(args.wait / 1000)
 
         for selector in args.hide:
             await page.evaluate(
