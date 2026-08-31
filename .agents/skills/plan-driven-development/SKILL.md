@@ -121,23 +121,9 @@ Rules:
 
 ### 5. Marketing Surfaces (user-visible features only)
 
-In-repo docs (`docs/`, `CLAUDE.md`, `CHANGELOG.md`) are for whoever maintains the code. They do nothing for the person deciding whether to buy or how to turn the feature on. The public site is a separate repo with its own conventions, so it gets its own milestone with explicit tasks — otherwise it is always the thing that never happens.
+The last milestone for a user-visible feature is the public site — docs page, blog/changelog post, screenshots, pricing tier line, email, social. **`marketing-surfaces` owns the detail**: which surfaces apply, who each one is written for, and how each is verified.
 
-Find the marketing repo first (a sibling checkout, or the `../` paths in `CLAUDE.md`) and read its conventions before writing tasks — generated directories, a required post pipeline, front-matter schemas. Never hand-edit generated output.
-
-The milestone covers, as applicable:
-
-- [ ] **Docs article** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. Use the product's own name for its docs surface (check the marketing repo/CLAUDE.md). Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one
-- [ ] **Blog/changelog post** — the announcement, following the repo's own writing pipeline/skill if it has one. Keep it SHORT: highlights only, and link to the docs article for the full installation and usage flow — the blog never duplicates the docs
-- [ ] **Pricing page** — if the feature is plan-gated, name the tier it needs
-- [ ] **Feature/landing copy** — only when the feature is a selling point, not for every change
-- [ ] **Screenshots** — capture the real feature from the running app via `mockups` and embed them in the post and docs page
-- [ ] Build and preview the site locally; confirm generated files regenerated
-- [ ] Email/social distribution, if the repo has that pipeline
-
-Gate the milestone on the feature actually being live — a docs page for something not yet deployed is worse than no page.
-
-**Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. Invoke `mockups` — it owns how our images are made (raw CDP capture of the element, then the Shots.so recipe), so never hand-crop a desktop screenshot or invent a background here. Commit the exports where the site keeps its images, matching the existing naming/directory convention and referenced the way existing posts reference theirs. Rules: real data (or realistic seeded data), never lorem or an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame — `mockups` will ask before shipping anything a customer wrote; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (a CLI/API-only feature), use a terminal capture or a fenced code block rather than skipping the visual entirely.
+Write the milestone as one task per surface from that skill's list, so nothing hides behind a single "marketing" checkbox. Find the marketing repo (a sibling checkout, or the `../` paths in `CLAUDE.md`) and read its conventions while planning, so the tasks match how that repo actually publishes.
 
 ### 6. Progress Summary Table
 At-a-glance status at the bottom of the file; update as milestones progress:
@@ -173,16 +159,11 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
    - self-documenting-apis: YES — new API endpoint
    - update-docs: YES — run after all milestones complete
    - mockups: YES — the blog post and docs page need product screenshots
+   - marketing-surfaces: YES — merchants can see this; needs a docs page + blog post + pricing line
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
 
-   Add one more line to the audit for **marketing surfaces** — the public site (marketing/docs/blog/pricing repo), which is not a powerups skill but drifts the same way:
-
-   ```
-   - marketing surfaces: YES — merchants can see this; needs a docs page + blog post + pricing line
-   ```
-
-   If YES, the plan gets a final milestone for it (see "Marketing surfaces" below). If NO — internal refactor, infra, dev-only tooling — say so in one line and move on.
+   If YES, the plan gets a final milestone for it — one task per surface from `marketing-surfaces` (see section 5). If NO — internal refactor, infra, dev-only tooling — say so in one line and move on.
 
    **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
 6. **Run `user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
@@ -251,7 +232,15 @@ Post-completion audit:
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
 6. Linter:                 DONE — no new warnings
 7. Full test suite:        DONE — 133 passed, 0 failed
-8. Marketing surfaces:     DONE — docs page + blog post (4 screenshots) + pricing tier line (../marketing-site PR #12)
+8. Marketing surfaces (../answerhq-web PR #14):
+   8a. Docs page:          DONE — /docs/drive-connector (technical: the engineer sets this up)
+   8b. Blog/changelog:     DONE — /blog/answer-from-your-drive-files (non-technical, links the docs page)
+   8c. Screenshots:        DONE — 4 mockups, before/after of the Connectors page
+   8d. Pricing page:       DONE — Drive listed under Growth
+   8e. Landing copy:       N/A — not a headline selling point
+   8f. Local preview:      DONE — built clean, generated blog/ regenerated
+   8g. Email:              DONE — broadcast sent, links the post
+   8h. Social:             DONE — LinkedIn + X drafts in the PR description
 9. PR ready:               YES — manual verification steps included
 ```
 
@@ -259,7 +248,7 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **Marketing surfaces** — for user-visible features, confirm the milestone from plan section 5 shipped (docs article with the full flow, short highlights blog/changelog post linking to it, real screenshots, pricing tier line). It lands as its own PR on the marketing repo; link it. "Nobody outside the codebase knows this exists yet" is not a completed feature.
+3. **`marketing-surfaces`** — for user-visible features, invoke it and report **every surface as its own line** (8a–8h above), each DONE with evidence or N/A with a one-line reason. A single lumped "marketing: DONE" line is not acceptable — the surfaces that get skipped are exactly the ones nobody itemized. It lands as its own PR on the marketing repo; link it.
 4. **Steps 3–7: the finishing sequence from `best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
 5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 

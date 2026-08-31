@@ -38,6 +38,12 @@ Options:
               auth token stays out of process listings and shell history.
               This is how you shoot an authenticated dashboard without
               typing a password into a script.
+  --allow-secrets
+              skip the secret scan. The scan reads the text inside the
+              clipped element and refuses to write the file when it looks
+              like a credential, a masked key, an email address or a
+              personal URL, because a marketing image is published. Rewrite
+              the strings with --eval instead of passing this.
   --cdp       Chrome DevTools endpoint (default http://localhost:29229).
 
 Needs a Chrome already listening on --cdp, plus pillow>=11 and
@@ -50,12 +56,56 @@ import base64
 import io
 import json
 import os
+import re
 from urllib.request import urlopen
 
 import websockets
 from PIL import Image
 
 LOAD_TIMEOUT = 30
+
+# Anything published in a marketing image is public forever, so the bar is
+# "looks like it could be private", not "is provably a live credential".
+# (reason, pattern, quotable) — a quotable hit is safe to echo back so it can be
+# rewritten; the rest are only ever reported by length.
+SECRET_PATTERNS = [
+    ("masked or partial key", re.compile(r"[A-Za-z0-9_\-]{2,}[\u2022\u2219*\u00b7]{3,}"), False),
+    ("masked or partial key", re.compile(r"[A-Za-z0-9_\-]{6,}\u2026"), False),
+    (
+        "api key or token",
+        re.compile(r"\b(?:sk|pk|rk|ahq|key|api|tok|ghp|gho|xox[bpsa])[_\-][A-Za-z0-9_\-]{8,}"),
+        False,
+    ),
+    ("bearer token", re.compile(r"\bBearer\s+\S+", re.I), False),
+    ("jwt", re.compile(r"\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}"), False),
+    (
+        "secret field",
+        re.compile(r"\b(?:client[ _]?secret|secret[ _]?key|private[ _]?key|password)\b", re.I),
+        True,
+    ),
+    ("email address", re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b"), True),
+    (
+        "tenant or instance url",
+        re.compile(
+            r"https?://[A-Za-z0-9\-]+\.(?:ngrok[\w\-.]*|vercel\.app|onrender\.com|supabase\.co)\S*"
+            r"|https?://localhost\S*"
+        ),
+        True,
+    ),
+]
+
+
+def find_secrets(text):
+    """Strings in the frame that must not be published, as "reason: hint" lines."""
+    hits = []
+    for reason, pattern, quotable in SECRET_PATTERNS:
+        for match in pattern.finditer(text or ""):
+            value = match.group(0).strip()
+            hint = value if quotable else f"{len(value)} characters, not repeated here"
+            line = f"{reason}: {hint}"
+            if line not in hits:
+                hits.append(line)
+    return hits
 
 
 class Session:
@@ -210,6 +260,11 @@ async def capture(args):
         if box["width"] < 2 or box["height"] < 2:
             raise SystemExit(f"{args.selector!r} has no size; is it collapsed or hidden?")
 
+        text = await page.evaluate(
+            "(document.querySelector(" + json.dumps(args.selector) + ")?.innerText) || ''"
+        )
+        secrets = [] if args.allow_secrets else find_secrets(text)
+
         shot = await page.send(
             "Page.captureScreenshot",
             format="png",
@@ -232,6 +287,14 @@ async def capture(args):
         )
         padded.paste(image, (margin, margin))
         image = padded
+    if secrets:
+        listed = "\n".join(f"  {hit}" for hit in secrets)
+        raise SystemExit(
+            f"refusing to write {args.out}; the frame reads as private:\n{listed}\n"
+            "Rewrite these strings with --eval so the shot shows a generic example,"
+            " or pass --allow-secrets if every hit is already public."
+        )
+
     image.save(args.out)
     print(
         f"{args.out}: {image.width}x{image.height} px"
@@ -256,6 +319,7 @@ def main():
     parser.add_argument("--click", action="append", default=[])
     parser.add_argument("--eval", action="append", default=[])
     parser.add_argument("--storage", action="append", default=[])
+    parser.add_argument("--allow-secrets", action="store_true")
     parser.add_argument("--cdp", default="http://localhost:29229")
     asyncio.run(capture(parser.parse_args()))
 
