@@ -37,11 +37,24 @@ Defaults are the house settings, so don't pass them: `--scale 2` (retina), `--zo
 the white margin that becomes the breathing room inside the glass rim — Shots has no
 inner-padding control, so it has to be in the source.
 
-Dashboard pages render real data. If the shot contains anything a customer wrote —
-questions, topics, conversation threads, tickets, connected accounts, names, emails —
-**ask whether to swap in generic placeholder text**, and default to swapping. Rewrite the
-strings in the DOM with `--eval` before the capture, walking text nodes so nested markup
-doesn't end up overlapping:
+## Nothing private in frame — not even partially
+
+A marketing image is published forever, so treat the frame as a public document. Never
+shoot a screen that shows, in any form:
+
+- API keys, tokens, secrets, passwords, webhook signing values or connection strings —
+  **including masked, truncated or first-few-characters previews**. A key with most of it
+  starred out is still a leak: it hands over the prefix, the length and the format. Shoot a
+  key page only after replacing every key string with an obvious fake
+  (`sk_live_example_key`), and prefer a different screen entirely.
+- The owner's own instance: tenant subdomains, localhost/ngrok/preview URLs, account IDs,
+  org names, workspace slugs, real customer or teammate names and email addresses.
+- Anything a customer wrote — questions, topics, conversation threads, tickets, connected
+  accounts.
+
+Default to a generic example, don't ask. Rewrite the strings in the DOM with `--eval`
+before the capture — the shot must read as a generic product demo, not as the requester's
+account — walking text nodes so nested markup doesn't end up overlapping:
 
 ```js
 const swap = new Map([["Wo ist meine Bestellung?", "Where is my order?"]]);
@@ -52,6 +65,17 @@ nodes.forEach(n => { const t = n.nodeValue.trim(); if (swap.has(t)) n.nodeValue 
 
 Keep counts, dates and labels plausible, and keep raw captures out of the repo's image
 directory — they are inputs, not assets.
+
+`capture.py` reads the text inside the clipped element and **refuses to write the file**
+when it looks like a credential, a masked key, an email address or a personal instance URL.
+That check is a floor, not a substitute for looking: it can't read text baked into a
+canvas, an image or a chart. When it fires, fix the DOM with `--eval`; `--allow-secrets`
+is only for a hit that is already public (a docs URL, a fake key), never a way past a real
+one.
+
+The same rule covers everything around the image: crop or rewrite before sharing, and
+don't paste the raw capture, the page URL or the console output containing them into a
+blog, a PR, a Slack thread or a changelog.
 
 ## 2. Compose in Shots
 
@@ -85,7 +109,10 @@ Export downloads a watermark-free PNG to `~/Downloads/<n>_1x_shots_so.png` at 19
 ## 3. Check it before shipping
 
 Open the export and look at it: one background, glass rim intact on all four sides, even
-margin inside the rim, real product UI, nothing stale or private in frame. Then open the
+margin inside the rim, real product UI. Then read every string in the frame, including the
+dim ones and the ones half-scrolled out — no key or key fragment, no email, no instance
+URL, no customer text, nothing stale. If you can't read a string in the export, zoom in
+until you can; an unreadable string is not a safe string. Then open the
 page it lands on at real width and confirm nothing is cropped through a heading — the site
 CSS has to be 4:3 too, or a 4:3 export gets sliced.
 
@@ -98,3 +125,5 @@ CSS has to be 4:3 too, or a 4:3 export gets sliced.
 - Ship at a ratio other than 4:3.
 - Leave lorem ipsum, test chats, personal emails, or old plan names in frame.
 - Publish real customer text, or invented metrics.
+- Show a secret, a token or any part of one, however masked or truncated.
+- Show the requester's own account, tenant or local URLs instead of a generic example.
