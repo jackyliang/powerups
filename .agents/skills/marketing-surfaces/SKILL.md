@@ -49,8 +49,8 @@ The split for a developer-facing feature:
 
 Each is a separate step, done and verified on its own. Do the ones that apply; state in one line why any is N/A.
 
-1. **Docs/help page** — how a customer turns the feature on, uses it, and its limits. Technical level per the rule above.
-2. **Blog/changelog post** — the announcement, following the site repo's own writing pipeline or skill if it has one. Non-technical. Links the docs page.
+1. **Docs/help page** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. Technical level per the rule above. Use the product's own name for its docs surface (check the marketing repo/CLAUDE.md). Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one.
+2. **Blog/changelog post** — the announcement, following the site repo's own writing pipeline or skill if it has one. Non-technical. Keep it SHORT: highlights only, and link the docs page for the full installation and usage flow — the blog never duplicates the docs.
 3. **Screenshots** — the real feature, captured from the running app via `mockups`, embedded in both the post and the docs page.
 4. **Pricing page** — only if the feature is plan-gated; name the tier it needs. The tier is a factual claim customers hold you to.
 5. **Feature/landing copy** — only when the feature is a selling point, not for every change.
