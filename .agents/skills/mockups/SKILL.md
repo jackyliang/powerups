@@ -28,8 +28,10 @@ It drives the Chrome already listening on `http://localhost:29229` (`--cdp` to c
 clips to the element, so there is no browser chrome to crop off. `--click <text>` puts the
 page in the state worth shooting, `--wait` covers pages that render skeletons first,
 `--hide <selector>` drops banners and chat widgets, `--eval <js>` edits the DOM before the
-shot, and `--storage KEY=ENV_VAR` seeds an auth token read from the environment for a
-signed-in page (never put the token itself on the command line).
+shot (each `--eval` is followed by another `--wait`, so an evaluated action that fires a
+request has time to render), and `--storage KEY=ENV_VAR` seeds an auth token read from the
+environment before the page loads, for a signed-in page (never put the token itself on the
+command line).
 
 Defaults are the house settings, so don't pass them: `--scale 2` (retina), `--zoom 1.25`
 (text stays readable once the image is scaled down in a post or a deck), and `--pad 4.5`,
