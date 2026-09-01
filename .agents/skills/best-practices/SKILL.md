@@ -92,7 +92,7 @@ The canonical completion sequence for any code change — `plan-driven-developme
 1. **`/simplify`** — review changed code for reuse, quality, and efficiency (duplicate code, N+1 queries, anti-patterns). Fix what it finds.
 2. **`change-log`** — CHANGELOG.md entry in plain language. User-facing changes only.
 3. **`update-docs`** — sync CLAUDE.md, README, guides, sibling repos. Small changes cause drift too.
-4. **`marketing-surfaces` triage** — every change, including bug fixes: does any public surface (blog/update post, docs or help-center article, pricing, landing copy) need updating? Usually N/A, said in one line. If unsure, ask the user. Anything that does need updating is drafted inline for review and lands as its own PR, never in this one (only the CHANGELOG entry stays here).
+4. **`marketing-surfaces` triage** — every change, including bug fixes: does any public surface (blog/update post, docs or help-center article, pricing, landing copy, in-app instructional copy such as integration setup panels) need updating? Usually N/A, said in one line. If unsure, ask the user. Anything that does need updating is drafted inline for review and lands as its own PR, never in this one (only the CHANGELOG entry stays here).
 5. **Lint** — run the project's linter (`ruff check`, `npm run lint`, …). Fix issues in files you changed; leave pre-existing issues in untouched files.
 6. **Full test suite** — all tests pass, not just the ones you added.
 

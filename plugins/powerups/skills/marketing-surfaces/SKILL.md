@@ -25,7 +25,7 @@ If any surface is UNSURE — a fix that changes visible behavior a help article 
 
 ## Review and delivery rules
 
-1. **Draft first, PR second.** Before opening any PR, share the proposed text inline with the user — the full docs/help article body, the post, the pricing line, the email — plus the screenshots. Wait for approval or edits. Never open a marketing PR the user has not seen the words of.
+1. **Draft first, PR second.** Before opening any PR, share the proposed text inline with the user — the full docs/help article body, the post, the pricing line, the email, the in-app copy — plus the screenshots. Wait for approval or edits. Never open a marketing PR the user has not seen the words of.
 2. **Separate PRs from the feature.** Marketing work never rides in the feature or bug-fix PR. Each lands as its own PR (on the marketing repo, or via the help-center API), so it can be reviewed and merged on its own schedule. The one exception is the `CHANGELOG.md` entry from `powerups:change-log`, which stays in the feature PR.
 3. **Gate on live.** Do not merge or publish a surface before the feature is in production (see below).
 
@@ -66,6 +66,7 @@ Each is a separate step, done and verified on its own. Do the ones that apply; s
 6. **Build and preview locally** — confirm generated files regenerated, and that links, images, and front matter render.
 7. **Email announcement** — if the repo has a send pipeline (e.g. a broadcast script), draft it in `powerups:qq` style: short, one idea, one link to the live post. Send after the post is live.
 8. **Social post** — if the repo/user has that pipeline: LinkedIn in broetry (one sentence per paragraph), X under 280 characters. Draft from the post, never from the PR description.
+9. **In-app copy** — instructional text inside the product that describes the changed behavior: setup steps in a settings slide-out or integration panel (e.g. the Slack integration's setup instructions), onboarding hints, empty states, tooltips, help links. Grep the app for the feature name and the old wording. This is the surface bug fixes most often stale; it lives in the product repo, so it still ships as its own PR, not inside the fix.
 
 **Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. `powerups:mockups` owns how our images are made (raw CDP capture of the element, then the Shots.so recipe) — never hand-crop a desktop screenshot or invent a background. Commit exports where the site keeps its images, matching the existing naming and directory convention. Rules: real or realistically seeded data, never lorem and never an empty state pretending to be full; no secrets, keys, customer PII, or internal-only orgs in frame; capture the before/after pair when the feature changes an existing screen. If a step genuinely can't be shown (CLI/API-only), use a terminal capture or a fenced code block rather than skipping the visual.
 
@@ -83,5 +84,6 @@ Marketing surfaces:
 6. Local preview:   DONE — built clean, generated blog/ regenerated
 7. Email:           DONE — broadcast sent to 412 subscribers, links the post
 8. Social:          DONE — LinkedIn + X drafts in the PR description
+9. In-app copy:     DONE — Connectors slide-out setup steps updated (answer-hq #NN)
 PR: ../answerhq-web #14
 ```
