@@ -120,7 +120,7 @@ Rules:
 
 ### 5. Marketing Surfaces (user-visible features only)
 
-The last milestone for a user-visible feature is the public site — docs page, blog/changelog post, screenshots, pricing tier line, email, social. **`powerups:marketing-surfaces` owns the detail**: which surfaces apply, who each one is written for, and how each is verified.
+The last milestone for a user-visible feature is the public site — docs page, blog/changelog post, screenshots, pricing tier line, email, social, in-app copy. **`powerups:marketing-surfaces` owns the detail**: which surfaces apply, who each one is written for, and how each is verified.
 
 Write the milestone as one task per surface from that skill's list, so nothing hides behind a single "marketing" checkbox. Find the marketing repo (a sibling checkout, or the `../` paths in `CLAUDE.md`) and read its conventions while planning, so the tasks match how that repo actually publishes.
 
@@ -240,6 +240,7 @@ Post-completion audit:
    8f. Local preview:      DONE — built clean, generated blog/ regenerated
    8g. Email:              DONE — broadcast sent, links the post
    8h. Social:             DONE — LinkedIn + X drafts in the PR description
+   8i. In-app copy:        DONE — Connectors slide-out setup steps (answer-hq PR #NN)
 9. PR ready:               YES — manual verification steps included
 ```
 
@@ -247,8 +248,8 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`powerups:drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **`powerups:marketing-surfaces`** — for user-visible features, invoke it and report **every surface as its own line** (8a–8h above), each DONE with evidence or N/A with a one-line reason. A single lumped "marketing: DONE" line is not acceptable — the surfaces that get skipped are exactly the ones nobody itemized. It lands as its own PR on the marketing repo; link it.
-4. **Steps 3–7: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
+3. **`powerups:marketing-surfaces`** — for user-visible features, invoke it and report **every surface as its own line** (8a–8i above), each DONE with evidence or N/A with a one-line reason. A single lumped "marketing: DONE" line is not acceptable — the surfaces that get skipped are exactly the ones nobody itemized. Drafts are shared with the user before any PR; it lands as its own PR (marketing repo, or product repo for in-app copy), separate from the feature PR; link it.
+4. **Steps 3–7: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, marketing triage, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
 5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
 ### PR manual verification steps — required

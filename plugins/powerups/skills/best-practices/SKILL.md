@@ -84,15 +84,16 @@ And if the change needs a picture of the UI anywhere a customer will see it — 
 
 If the change adds or modifies API endpoints, invoke `self-documenting-apis` — endpoint docstrings, typed request/response models with field descriptions, status codes, router tags. Auto-generated docs (`/docs`, `/redoc`) are the only API reference; never maintain a separate api-reference.md.
 
-### 9. Finish: Simplify → Change Log → Docs → Lint → Tests
+### 9. Finish: Simplify → Change Log → Docs → Marketing Triage → Lint → Tests
 
 The canonical completion sequence for any code change — `plan-driven-development` and `bug-fix` reference this instead of restating it. Run after the code works, in this order:
 
 1. **`/simplify`** — review changed code for reuse, quality, and efficiency (duplicate code, N+1 queries, anti-patterns). Fix what it finds.
 2. **`powerups:change-log`** — CHANGELOG.md entry in plain language. User-facing changes only.
 3. **`update-docs`** — sync CLAUDE.md, README, guides, sibling repos. Small changes cause drift too.
-4. **Lint** — run the project's linter (`ruff check`, `npm run lint`, …). Fix issues in files you changed; leave pre-existing issues in untouched files.
-5. **Full test suite** — all tests pass, not just the ones you added.
+4. **`powerups:marketing-surfaces` triage** — every change, including bug fixes: does any public surface (blog/update post, docs or help-center article, pricing, landing copy, in-app instructional copy such as integration setup panels) need updating? Usually N/A, said in one line. If unsure, ask the user. Anything that does need updating is drafted inline for review and lands as its own PR, never in this one (only the CHANGELOG entry stays here).
+5. **Lint** — run the project's linter (`ruff check`, `npm run lint`, …). Fix issues in files you changed; leave pre-existing issues in untouched files.
+6. **Full test suite** — all tests pass, not just the ones you added.
 
 ## Quick Reference
 
@@ -106,5 +107,5 @@ The canonical completion sequence for any code change — `plan-driven-developme
 6.  No backward compat (unless explicitly asked)
 7.  UI → simple-design-principles + frontend-design
 8.  API → self-documenting-apis
-9.  Finish: simplify → change-log → update-docs → lint → full suite
+9.  Finish: simplify → change-log → update-docs → marketing triage → lint → full suite
 ```
