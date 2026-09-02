@@ -218,7 +218,7 @@ When a milestone completes, stop and let the user test manually before moving on
 
 ### After all milestones complete — POST-COMPLETION AUDIT
 
-The audit gates the PR. **Output it to the user before creating the PR** — each step, its status, and evidence. Do not create the PR until every item is done.
+The audit gates the PR. **Output it to the user before creating the PR** — each step, its status, and evidence. Do not create the PR until every item is DONE or N/A — except marketing surfaces, where DRAFTED (triage complete, drafts approved by the user) is the passing state, because the marketing PR can't open until the feature is live.
 
 Each line is one skill invoked as a self-contained step; the skill owns its own checklist and output format, and the audit records the result.
 
@@ -277,7 +277,7 @@ Never write vague test plans ("verify it works"). Every step should be reproduci
 If code is reverted, the plan reverts too: uncheck the rolled-back tasks (`- [x]` → `- [ ]`) and update the progress table. The plan must always match reality.
 
 ### Completing a plan
-All checkboxes checked, progress table all "Done", plan stays in `plans/` as historical record.
+All checkboxes checked, progress table all "Done", plan stays in `plans/` as historical record. The marketing milestone's tasks are checked off after deploy, when the marketing PR lands — a plan with a shipped feature and an open marketing milestone is still in progress, not done.
 
 ## Common Mistakes
 
