@@ -36,14 +36,13 @@ If any surface is UNSURE — a fix that changes visible behavior a help article 
 
 1. **Draft first, PR second.** Before opening any PR, share the proposed text inline with the user — the full docs/help article body, the post, the pricing line, the email, the in-app copy — plus the screenshots. Wait for approval or edits. Never open a marketing PR the user has not seen the words of.
 2. **Separate PRs from the feature.** Marketing work never rides in the feature or bug-fix PR. Each lands as its own PR (on the marketing repo, or via the help-center API), so it can be reviewed and merged on its own schedule. The one exception is the `CHANGELOG.md` entry from `powerups:change-log`, which stays in the feature PR.
-3. **Gate on live.** Do not merge or publish a surface before the feature is in production (see below).
+3. **Gate on live.** Draft and get approval any time — PDD's audit needs the approved drafts before the feature PR. But do not open, merge, or publish the marketing PR before the feature is in production; a docs page for something not yet deployed is worse than no page.
 
 ## Before writing anything
 
 1. **Find the marketing repo** — a sibling checkout, or the `../` paths in `CLAUDE.md`.
 2. **Read its conventions** — front-matter schema, image directory and naming, generated directories, a required post pipeline or writing skill. Follow the repo's pipeline; never hand-edit generated output.
-3. **Gate on the feature being live.** A docs page for something not yet deployed is worse than no page.
-4. **Pick the audience per surface** (below) before drafting a word.
+3. **Pick the audience per surface** (below) before drafting a word.
 
 ## Audience — decide per surface, not per feature
 
