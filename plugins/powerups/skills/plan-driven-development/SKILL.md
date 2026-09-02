@@ -224,13 +224,13 @@ Each line is one skill invoked as a self-contained step; the skill owns its own 
 
 ```
 Post-completion audit:
-1. Skill audit review:     DONE — all 6 YES skills executed (best-practices, TDD, simple-design, change-log, update-docs, marketing-surfaces)
+1. Skill audit review:     DONE — all 9 YES skills executed (best-practices, user-research, TDD, simple-design, self-documenting-apis, change-log, update-docs, marketing-surfaces, mockups)
 2. Drift audit:            DONE — additive: 7 unplanned widgets + 3 deps recorded in plan;
                                   subtractive: 4 orphan files deleted, 2 completed Post-MVP items removed
 3. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
 4. change-log:             DONE — added entry "Your assistant can now..."
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
-6. Marketing surfaces:     DONE — 9-line surface report below; ../answerhq-web PR #14, in-app copy answer-hq PR #NN
+6. Marketing surfaces:     DRAFTED — 9-line surface report below; drafts approved, ../answerhq-web PR opens after deploy
 7. Linter:                 DONE — no new warnings
 8. Full test suite:        DONE — 133 passed, 0 failed
 9. PR ready:               YES — manual verification steps included
@@ -240,7 +240,7 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`powerups:drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **Steps 3–8: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `powerups:change-log`, `update-docs`, `powerups:marketing-surfaces`, lint, full test suite, in that order. Each skill is invoked, not paraphrased. For marketing-surfaces, paste that skill's own per-surface report (one line per surface, DONE with evidence or N/A with a reason) under line 6 — a lumped "marketing: DONE" is not acceptable. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
+3. **Steps 3–8: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `powerups:change-log`, `update-docs`, `powerups:marketing-surfaces`, lint, full test suite, in that order. Each skill is invoked, not paraphrased. For marketing-surfaces, paste that skill's own per-surface report (one line per surface, DRAFTED/DONE with evidence or N/A with a reason) under line 6 — a lumped "marketing: DONE" is not acceptable. What gates the feature PR is the triage plus user-approved drafts; the marketing PR itself opens, merges and publishes only after the feature is live (that skill's "gate on live" rule), so come back and flip line 6 to DONE with the PR link once it ships. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
 4. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
 ### PR manual verification steps — required
