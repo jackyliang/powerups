@@ -1,6 +1,6 @@
 ---
 name: update-docs
-description: Invoke after completing a feature to sync all documentation — local docs, sibling repos, skill plugins, and downstream project docs. Scans everything by default.
+description: Invoke after completing a feature to sync maintainer documentation — CLAUDE.md, README, in-repo guides, plan files, sibling repos, skill plugins, and downstream project docs. Scans everything by default. Public-site pages (docs/help, blog, pricing) belong to marketing-surfaces, not here.
 ---
 
 # Update Docs
@@ -8,6 +8,8 @@ description: Invoke after completing a feature to sync all documentation — loc
 ## Overview
 
 After shipping a feature, documentation drifts. This skill finds what's stale and updates it — across ALL repos, not just the current one.
+
+**Scope: docs written for whoever maintains the code.** CLAUDE.md, README, `docs/`, `.env.example`, `plans/`, and the same files in sibling repos. Anything a customer reads — help/docs pages, blog or product-updates posts, pricing, screenshots, in-app copy — is `powerups:marketing-surfaces`; `CHANGELOG.md` is `powerups:change-log`. This skill never touches those, and never duplicates their triage.
 
 ## When to Use
 
@@ -46,14 +48,6 @@ Spawn an `Explore` subagent to discover every doc file that might need updating.
 4. **`.env.example`** — env var reference
 5. **`plans/`** — plan files with status tables or task checkboxes
 
-**Marketing / public site (always scan when the change is user-visible):**
-
-The public site is usually its own repo (marketing pages, `docs/`, `blog/`, `pricing/`). It is the only documentation customers actually read, and it drifts hardest because it lives outside the code repo:
-1. **Docs/help pages** — does a page exist for this feature, and does it describe current behavior, limits, and setup? Check the **screenshots** too: a shot of a screen that has since changed is the stalest kind of doc, and re-shooting is `powerups:mockups`, not a hand-cropped grab.
-2. **Pricing page** — plan gating changed? The tier a feature requires is a factual claim customers hold you to.
-3. **Blog/changelog** — is there an announcement for a shipped user-visible feature? If not, flag it and hand off to `powerups:marketing-surfaces` (this skill doesn't write posts).
-4. **Generated output** — `blog/`, `sitemap.xml`, and similar are build artifacts in many static sites. Edit the source content and run the site's build; never hand-edit them.
-
 **Sibling repos (always scan):**
 
 Grep CLAUDE.md for `../` paths to find sibling repos. For EVERY sibling repo found:
@@ -61,6 +55,8 @@ Grep CLAUDE.md for `../` paths to find sibling repos. For EVERY sibling repo fou
 7. **README.md** — check for stale API descriptions, ports, defaults
 8. **Skill/plugin docs** — API references, recipes, guides, integration docs
 9. **Any `docs/` directory** — in-repo guides in sibling repos
+
+If a sibling repo is the public/marketing site, scan only its maintainer docs (CLAUDE.md, README). Its published pages are out of scope here — the finishing sequence runs `powerups:marketing-surfaces` right after this skill, and that triage covers them.
 
 **This is not optional.** If CLAUDE.md references `../other-project/`, scan that project's docs too. Documentation drifts most at repo boundaries.
 
@@ -175,7 +171,8 @@ When you find this, **recommend consolidation** before making edits. Ask the use
 
 ## Rules
 
-- **Scan everything.** Local docs, the marketing/public site, AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
+- **Scan everything.** Local docs AND all sibling repos. No opt-in flags. Comprehensive coverage is the whole point.
+- **Stay in scope.** Customer-facing pages are `powerups:marketing-surfaces`; `CHANGELOG.md` is `powerups:change-log`. Don't re-triage them here.
 - **All investigation in subagents.** Reading docs consumes context. Subagents read and return concise diffs.
 - **Don't add docs that don't exist.** This skill updates existing docs, not creates new ones. If a doc is missing entirely, flag it and ask the user if they want it created.
 - **Flag scatter, don't perpetuate it.** If the same integration is partially documented in multiple places, recommend consolidation before adding more partial docs.
