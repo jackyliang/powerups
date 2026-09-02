@@ -86,12 +86,12 @@ If the change adds or modifies API endpoints, invoke `self-documenting-apis` —
 
 ### 9. Finish: Simplify → Change Log → Docs → Marketing Triage → Lint → Tests
 
-The canonical completion sequence for any code change — `plan-driven-development` and `bug-fix` reference this instead of restating it. Run after the code works, in this order:
+The canonical completion sequence for any code change — `plan-driven-development` and `bug-fix` reference this instead of restating it. Each step is one skill with its own scope; invoke it and record its output, don't paraphrase its checklist. Run after the code works, in this order:
 
 1. **`/simplify`** — review changed code for reuse, quality, and efficiency (duplicate code, N+1 queries, anti-patterns). Fix what it finds.
-2. **`powerups:change-log`** — CHANGELOG.md entry in plain language. User-facing changes only.
-3. **`update-docs`** — sync CLAUDE.md, README, guides, sibling repos. Small changes cause drift too.
-4. **`powerups:marketing-surfaces` triage** — every change, including bug fixes: does any public surface (blog/update post, docs or help-center article, pricing, landing copy, in-app instructional copy such as integration setup panels) need updating? Usually N/A, said in one line. If unsure, ask the user. Anything that does need updating is drafted inline for review and lands as its own PR, never in this one (only the CHANGELOG entry stays here).
+2. **`powerups:change-log`** — the `CHANGELOG.md` entry. User-facing changes only; stays in this PR.
+3. **`update-docs`** — maintainer docs: CLAUDE.md, README, guides, sibling repos. Small changes cause drift too.
+4. **`powerups:marketing-surfaces`** — customer-facing surfaces, triaged on every change including bug fixes. Usually N/A, said in one line per surface. Anything it does update lands as its own PR, never in this one.
 5. **Lint** — run the project's linter (`ruff check`, `npm run lint`, …). Fix issues in files you changed; leave pre-existing issues in untouched files.
 6. **Full test suite** — all tests pass, not just the ones you added.
 

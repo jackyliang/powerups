@@ -111,7 +111,7 @@ If any other test broke, fix the regression **without breaking the original fix*
 
 ### Step 9: Finishing sequence
 
-Run the finishing sequence from `best-practices` practice #9: `/simplify`, `change-log` (skip if the fix isn't user-facing), `update-docs`, `marketing-surfaces` triage (does a help article, docs page, or post describe the old behavior? if unsure, ask; any update is drafted inline and lands as a separate PR), and lint. The full test suite already ran in Step 7.
+Run the finishing sequence from `best-practices` practice #9: `/simplify`, `change-log` (skip if the fix isn't user-facing), `update-docs` (maintainer docs), `marketing-surfaces` (customer-facing surfaces — it owns the triage; report its output), and lint. The full test suite already ran in Step 7.
 
 **Success criteria:** Simplify findings fixed, CHANGELOG.md updated (if user-facing), docs synced, marketing triage reported (one line per surface or N/A), linter clean on changed files.
 

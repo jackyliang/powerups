@@ -120,9 +120,7 @@ Rules:
 
 ### 5. Marketing Surfaces (user-visible features only)
 
-The last milestone for a user-visible feature is the public site — docs page, blog/changelog post, screenshots, pricing tier line, email, social, in-app copy. **`powerups:marketing-surfaces` owns the detail**: which surfaces apply, who each one is written for, and how each is verified.
-
-Write the milestone as one task per surface from that skill's list, so nothing hides behind a single "marketing" checkbox. Find the marketing repo (a sibling checkout, or the `../` paths in `CLAUDE.md`) and read its conventions while planning, so the tasks match how that repo actually publishes.
+The last milestone for a user-visible feature is the public side. **`powerups:marketing-surfaces` owns it entirely** — the surface list, the audience per surface, and how each is verified. PDD adds one rule: write the milestone as one task per surface from that skill's list, so nothing hides behind a single "marketing" checkbox. Read that skill while planning so the tasks match how the marketing repo actually publishes.
 
 ### 6. Progress Summary Table
 At-a-glance status at the bottom of the file; update as milestones progress:
@@ -156,13 +154,14 @@ Every agent prompt must include: a reference to the plan file ("Read `plans/v{N}
    - test-driven-development: YES — new backend logic needs tests
    - simple-design-principles: YES — frontend UI with user-facing copy
    - self-documenting-apis: YES — new API endpoint
-   - update-docs: YES — run after all milestones complete
-   - mockups: YES — the blog post and docs page need product screenshots
-   - marketing-surfaces: YES — merchants can see this; needs a docs page + blog post + pricing line
+   - change-log: YES — user-facing; one CHANGELOG.md line when the feature completes
+   - update-docs: YES — CLAUDE.md env table and the connector guide will drift
+   - marketing-surfaces: YES — merchants can see this; final milestone, one task per surface
+   - mockups: YES — invoked by marketing-surfaces for the screenshots
    - bug-fix: NO — this is a new feature, not a bug fix
    ```
 
-   If YES, the plan gets a final milestone for it — one task per surface from `powerups:marketing-surfaces` (see section 5). If NO — internal refactor, infra, dev-only tooling — say so in one line and move on.
+   If marketing-surfaces is YES, the plan gets a final milestone for it (see section 5). If NO — internal refactor, infra, dev-only tooling — say so in one line and move on.
 
    **Every YES skill must appear as an explicit task or note in the relevant milestone.** Don't rely on remembering — write it into the plan.
 6. **Run `powerups:user-research` (user-facing features only) — BEFORE writing the plan.** Its brief feeds the Context and Design sections and turns silent assumptions into explicit decisions. Get the requester's answers to the hand-off questions first. That skill owns the skip conditions.
@@ -221,26 +220,19 @@ When a milestone completes, stop and let the user test manually before moving on
 
 The audit gates the PR. **Output it to the user before creating the PR** — each step, its status, and evidence. Do not create the PR until every item is done.
 
+Each line is one skill invoked as a self-contained step; the skill owns its own checklist and output format, and the audit records the result.
+
 ```
 Post-completion audit:
-1. Skill audit review:     DONE — all 5 YES skills executed (best-practices, TDD, simple-design, update-docs, change-log)
+1. Skill audit review:     DONE — all 6 YES skills executed (best-practices, TDD, simple-design, change-log, update-docs, marketing-surfaces)
 2. Drift audit:            DONE — additive: 7 unplanned widgets + 3 deps recorded in plan;
                                   subtractive: 4 orphan files deleted, 2 completed Post-MVP items removed
 3. /simplify:              DONE — deleted 200 lines dead code, fixed 3 issues
 4. change-log:             DONE — added entry "Your assistant can now..."
 5. update-docs:            DONE — CLAUDE.md and connector guide updated
-6. Linter:                 DONE — no new warnings
-7. Full test suite:        DONE — 133 passed, 0 failed
-8. Marketing surfaces (../answerhq-web PR #14):
-   8a. Docs page:          DONE — /docs/drive-connector (technical: the engineer sets this up)
-   8b. Blog/changelog:     DONE — /blog/answer-from-your-drive-files (non-technical, links the docs page)
-   8c. Screenshots:        DONE — 4 mockups, before/after of the Connectors page
-   8d. Pricing page:       DONE — Drive listed under Growth
-   8e. Landing copy:       N/A — not a headline selling point
-   8f. Local preview:      DONE — built clean, generated blog/ regenerated
-   8g. Email:              DONE — broadcast sent, links the post
-   8h. Social:             DONE — LinkedIn + X drafts in the PR description
-   8i. In-app copy:        DONE — Connectors slide-out setup steps (answer-hq PR #NN)
+6. Marketing surfaces:     DONE — 9-line surface report below; ../answerhq-web PR #14, in-app copy answer-hq PR #NN
+7. Linter:                 DONE — no new warnings
+8. Full test suite:        DONE — 133 passed, 0 failed
 9. PR ready:               YES — manual verification steps included
 ```
 
@@ -248,9 +240,8 @@ Post-completion audit:
 
 1. **Skill audit review** — confirm every YES skill from the planning audit was executed; if any was missed, execute it now.
 2. **`powerups:drift-audit`** — invoke it; it owns the detail. It runs BEFORE `/simplify` so the cleanup is informed by both directions of drift.
-3. **`powerups:marketing-surfaces`** — for user-visible features, invoke it and report **every surface as its own line** (8a–8i above), each DONE with evidence or N/A with a one-line reason. A single lumped "marketing: DONE" line is not acceptable — the surfaces that get skipped are exactly the ones nobody itemized. Drafts are shared with the user before any PR; it lands as its own PR (marketing repo, or product repo for in-app copy), separate from the feature PR; link it.
-4. **Steps 3–7: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `change-log`, `update-docs`, marketing triage, lint, full test suite, in that order. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
-5. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
+3. **Steps 3–8: the finishing sequence from `powerups:best-practices` practice #9** — `/simplify`, `powerups:change-log`, `update-docs`, `powerups:marketing-surfaces`, lint, full test suite, in that order. Each skill is invoked, not paraphrased. For marketing-surfaces, paste that skill's own per-surface report (one line per surface, DONE with evidence or N/A with a reason) under line 6 — a lumped "marketing: DONE" is not acceptable. A green full suite is a hard gate: tests and code drift independently (fixtures on old table names while code uses new ones), and a full run is the only way to catch it.
+4. **Create the PR** with manual verification steps (below), referencing the drift section so reviewers don't reverse-engineer scope creep.
 
 ### PR manual verification steps — required
 
@@ -296,8 +287,7 @@ All checkboxes checked, progress table all "Done", plan stays in `plans/` as his
 | Vague tasks ("set up auth") | Be specific: file paths, endpoint names, model fields |
 | Creating a plan file for a 10-minute fix | Use lightweight mode — no file, but all PDD rules still apply |
 | Tracking progress elsewhere (todos, comments) | The plan file is the single source of truth |
-| Shipping the code and calling the feature done | User-visible features aren't done until the marketing site says they exist — docs page, post, pricing line |
-| Hand-editing generated marketing pages (`blog/`, `sitemap.xml`) | Edit the source content and run the site's build |
-| A blog post describing a UI with no screenshots | Invoke `powerups:mockups` and shoot the real screens — you have a browser |
+| Shipping the code and calling the feature done | User-visible features aren't done until `powerups:marketing-surfaces` reports every surface DONE or N/A |
+| Restating another skill's checklist in the plan | Invoke the skill (`change-log`, `update-docs`, `marketing-surfaces`, `mockups`) and record its output — it owns the detail |
 | Skipping the full suite before the PR | Tests and code drift independently (fixtures on old table names). A full run is the only way to catch it |
 | Implementing differently than planned without updating the plan | Add a `> **Revised:**` note in the same commit as the code. The drift audit is the last chance to catch this before the PR |
