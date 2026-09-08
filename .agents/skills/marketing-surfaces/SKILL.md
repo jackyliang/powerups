@@ -68,14 +68,26 @@ The split for a developer-facing feature:
 Each is a separate step, done and verified on its own. Do the ones that apply; state in one line why any is N/A.
 
 1. **Docs/help page** — the FULL installation and usage flow: how a customer turns the feature on, every step of using it, and its limits. Technical level per the rule above. Use the product's own name for its docs surface (check the marketing repo/CLAUDE.md). Only create a NEW article for large features; ask the user if unsure whether the feature warrants its own article or belongs in an existing one. Bug fixes usually hit this surface, not a post: if an existing help/knowledge article describes the old behavior, it needs the UPDATE.
-2. **Blog/product-updates post** — the public announcement on the site, following the site repo's own writing pipeline or skill if it has one. Non-technical. Keep it SHORT: highlights only, and link the docs page for the full installation and usage flow — the blog never duplicates the docs. (The `CHANGELOG.md` line that feeds the updates feed is `change-log`, not this step.)
+2. **Blog/product-updates post** — the public announcement on the site, following the site repo's own writing pipeline or skill if it has one. Non-technical. Keep it SHORT: highlights only, and link the docs page for the full installation and usage flow — the blog never duplicates the docs. Write every item to the rules in "Product update copy" below. (The `CHANGELOG.md` line that feeds the updates feed is `change-log`, not this step.)
 3. **Screenshots** — the real feature, captured from the running app via `mockups`, embedded in both the post and the docs page.
 4. **Pricing page** — only if the feature is plan-gated; name the tier it needs. The tier is a factual claim customers hold you to.
 5. **Feature/landing copy** — only when the feature is a selling point, not for every change.
 6. **Build and preview locally** — confirm generated files regenerated, and that links, images, and front matter render.
-7. **Email announcement** — if the repo has a send pipeline (e.g. a broadcast script), draft it in `qq` style: short, one idea, one link to the live post. Send after the post is live.
+7. **Email announcement** — if the repo has a send pipeline (e.g. a broadcast script), draft it in `qq` style: short, one idea, one link to the live post. A roll-up update email is the post's copy minus images, with one line in the intro pointing at the post for screenshots. Send after the post is live. Most broadcast providers only edit drafts: to change a scheduled send, create and schedule the replacement for the same slot (same from / reply-to / audience), verify it is scheduled, then delete the old one.
 8. **Social post** — if the repo/user has that pipeline: LinkedIn in broetry (one sentence per paragraph), X under 280 characters. Draft from the post, never from the PR description.
 9. **In-app copy** — instructional text inside the product that describes the changed behavior: setup steps in a settings slide-out or integration panel (e.g. the Slack integration's setup instructions), onboarding hints, empty states, tooltips, help links. Grep the app for the feature name and the old wording. This is the surface bug fixes most often stale; it lives in the product repo, so it still ships as its own PR, not inside the fix.
+
+## Product update copy
+
+Applies to every item in a launch post, a roll-up ("Update #N") post, and the matching email. The reader is a business owner skimming on their phone.
+
+- **Pain first, not feature first.** Each item opens with one bold sentence naming the problem the reader has or the outcome they get ("Fix one thing about how your assistant talks without worrying about the rest."), never the feature name ("Personality rules"). Then one to three plain sentences: what it used to cost them, what is different now.
+- **Title and email subject are solution-oriented too**: "Safer edits, shared admin, a Slack bot that keeps up", not "Personality rules, team roles, Slack bot". Once a post is live, keep its slug; only the title changes.
+- **One CTA link per item, on its own line under the paragraph**, phrased as an action: "Learn how X works", "Start using Y now", "See what Autopilot can do for you". It points at the docs/help article for that item; if none exists, write and publish the article first (surface 1). No inline links inside the paragraph.
+- Items with nothing to click through to (model upgrades, fixes) get one short sentence and no link. Say the outcome ("answers are smarter and faster"), not which model.
+- **Don't narrate the format.** Never write "each one written around the problem it fixes" or "every item links to a short article"; the reader can see that.
+- Use the product's own name for its docs surface, spelled and capitalised the way the product does (e.g. "Help Center", not "help-center").
+- One screenshot per item that has UI, via `mockups`; items without UI stay text-only.
 
 **Screenshots are not optional for anything with a UI.** A post describing a screen nobody can see reads like a press release; one showing the actual screen is the whole point. This skill decides *what* to show: every screen the feature adds or changes, as a before/after pair when it changes an existing one, and a terminal capture or fenced code block when a step genuinely has no UI (CLI/API-only). `mockups` owns *how* the image is made and what may appear in frame — invoke it, don't paraphrase its rules. Commit exports where the site keeps its images, matching the existing naming and directory convention.
 
