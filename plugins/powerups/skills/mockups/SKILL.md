@@ -37,6 +37,28 @@ Defaults are the house settings, so don't pass them: `--scale 2` (retina), `--zo
 the white margin that becomes the breathing room inside the glass rim — Shots has no
 inner-padding control, so it has to be in the source.
 
+**Margin rule: at least 20 px between every visible element and every edge of the raw
+source**, measured on the source file, on all four sides, before it goes into Shots. Text,
+avatars, buttons, table rules, scrollbars — anything drawn counts. Shots rounds the corners
+and adds the rim right at the image edge, so an element that touches the edge reads as cut
+off in the export. `--pad 4.5` gives ~65 px on a 1440-wide capture, so a `capture.py` shot
+passes unless the clipped element is very narrow; check the number on narrow ones.
+
+When the source didn't come from `capture.py` (a phone screenshot the requester sent, a
+Discord or Slack capture), measure it and, if anything sits inside 20 px of an edge, pad it
+with the source's own background colour before uploading — sample the colour from a corner,
+never white on a dark UI — and pad generously (40–50 px), not to the minimum:
+
+```python
+from PIL import Image, ImageOps
+im = Image.open("raw-discord.png").convert("RGB")
+bg = im.getpixel((2, 2))
+ImageOps.expand(im, border=(48, 40, 48, 40), fill=bg).save("raw-discord-padded.png")
+```
+
+This is padding the source, not compositing — the background, rim and shadow still come from
+Shots.
+
 ## Nothing private in frame — not even partially
 
 A marketing image is published forever, so treat the frame as a public document. Never
@@ -109,7 +131,11 @@ Export downloads a watermark-free PNG to `~/Downloads/<n>_1x_shots_so.png` at 19
 ## 3. Check it before shipping
 
 Open the export and look at it: one background, glass rim intact on all four sides, even
-margin inside the rim, real product UI. Then read every string in the frame, including the
+margin inside the rim, real product UI. Measure the inner margin: nothing drawn may sit
+within 20 px of the rim on any side (in the 1920 × 1440 export that is roughly 20 px of the
+source scaled, so aim for visibly more — 50 px+ of dark or white space between the rim and
+the nearest text or avatar). If a side is tight, go back to step 1 and pad the source; don't
+ship it and don't fix it in Shots. Then read every string in the frame, including the
 dim ones and the ones half-scrolled out — no key or key fragment, no email, no instance
 URL, no customer text, nothing stale. If you can't read a string in the export, zoom in
 until you can; an unreadable string is not a safe string. Then open the
@@ -123,6 +149,7 @@ CSS has to be 4:3 too, or a 4:3 export gets sliced.
 - Re-composite an image out of the site's image directory — those already have a
   background, and a second pass through Shots stacks another one. Use a raw capture.
 - Ship at a ratio other than 4:3.
+- Ship a source with anything drawn inside 20 px of its edge — pad it first.
 - Leave lorem ipsum, test chats, personal emails, or old plan names in frame.
 - Publish real customer text, or invented metrics.
 - Show a secret, a token or any part of one, however masked or truncated.
