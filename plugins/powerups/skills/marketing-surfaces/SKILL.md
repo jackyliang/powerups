@@ -80,6 +80,7 @@ Each is a separate step, done and verified on its own. Do the ones that apply; s
 
 Applies to every item in a launch post, a roll-up ("Update #N") post, and the roll-up email (a single-feature launch email stays qq-short, see surface 7). The reader is a business owner skimming on their phone.
 
+- **As short as it can be and still convey the information.** Every sentence must earn its place: cut background, restated benefits, and anything the CTA's article already covers. If a sentence can go without the reader losing a fact, it goes.
 - **Pain first, not feature first.** Each item opens with one bold sentence naming the problem the reader has or the outcome they get ("Fix one thing about how your assistant talks without worrying about the rest."), never the feature name ("Personality rules"). Then one to three plain sentences: what it used to cost them, what is different now.
 - **Title and email subject are solution-oriented too**: "Safer edits, shared admin, a Slack bot that keeps up", not "Personality rules, team roles, Slack bot". Once a post is live, keep its slug; only the title changes.
 - **One CTA link per item, on its own line under the paragraph**, phrased as an action: "Learn how X works", "Start using Y now", "See what Autopilot can do for you". It points at the docs/help article for that item; if none exists, write and publish the article first (surface 1). No inline links inside the paragraph.
